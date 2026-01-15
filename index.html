@@ -4,7 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roy Steves</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --brand-primary: #00B4D8;
+      --brand-dark: #0077B6;
+      --brand-accent: #90E0EF;
+      --bg-dark: #0a0f1a;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-subtle: rgba(0, 180, 216, 0.15);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -12,54 +27,207 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      color: #fff;
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(0, 180, 216, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(0, 119, 182, 0.06) 0%, transparent 50%);
+      color: var(--text-primary);
+      line-height: 1.7;
     }
 
     .container {
-      text-align: center;
-      padding: 2rem;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    header {
+      margin-bottom: 3rem;
     }
 
     h1 {
-      font-size: 3rem;
-      font-weight: 300;
-      margin-bottom: 1rem;
-      letter-spacing: 0.1em;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--brand-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .tagline {
-      font-size: 1.25rem;
-      color: #94a3b8;
-      font-weight: 300;
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 500;
     }
 
     .divider {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #4f8fea, transparent);
-      margin: 2rem auto;
+      height: 1px;
+      background: linear-gradient(90deg, var(--brand-primary), transparent);
+      margin: 2rem 0;
+      opacity: 0.3;
     }
 
-    .coming-soon {
-      font-size: 0.875rem;
-      color: #64748b;
+    .content p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .content p:first-of-type::first-line {
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+
+    .highlight {
+      color: var(--brand-accent);
+    }
+
+    .philosophy {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .philosophy p {
+      margin-bottom: 0;
+      font-style: italic;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.1em;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .links a:hover {
+      background: rgba(0, 180, 216, 0.1);
+      border-color: var(--brand-primary);
+      color: var(--brand-accent);
+      transform: translateY(-1px);
+    }
+
+    .links a svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 2rem 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .links {
+        flex-direction: column;
+      }
+
+      .links a {
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Roy Steves</h1>
-    <p class="tagline">Something interesting is on the way</p>
+    <header>
+      <h1>Roy Steves</h1>
+      <p class="subtitle">Pool Industry / Ecommerce / AI</p>
+    </header>
+
     <div class="divider"></div>
-    <p class="coming-soon">Coming Soon</p>
+
+    <div class="content">
+      <p>I started in the pool supplies industry over 15 years ago, including a stretch as VP of Digital Marketing at Leslie's. Now I co-own two businesses with Shilo Jones: <span class="highlight">StatBid</span>, a search-marketing agency we started in 2015, and <span class="highlight">Poolaroo</span>, a pool supply store we launched in 2025 with Dieter Davis.</p>
+
+      <p>The pool and spa industry is full of hardworking folks, but many are struggling to keep up with the changing environment of Ecommerce and how shoppers interact with online retail through marketing channels, search engines, and now, Artificial Intelligence platforms.</p>
+
+      <p>Poolaroo represents our approach to a technology-forward, modern online retail experience. As brick and mortar pool stores struggle, and Amazon continues to just be a lightly-supported vending machine, we feel there's a lot that could be better about the experience of owning a pool or spa.</p>
+
+      <div class="philosophy">
+        <p>We focus on getting the fundamentals right: in-house product photography, rock solid customer service, and constantly expanding product selection. The way we use emerging technology shouldn't feel forced. It should simply let us do our jobs a bit better, a bit faster. The best technology is invisible, after all.</p>
+      </div>
+    </div>
+
+    <h2>Elsewhere</h2>
+    <div class="links">
+      <a href="https://poolaroo.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Poolaroo
+      </a>
+      <a href="https://linkedin.com/in/roysteves" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+        LinkedIn
+      </a>
+      <a href="https://statbid.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/>
+          <path d="M18 17V9"/>
+          <path d="M13 17V5"/>
+          <path d="M8 17v-3"/>
+        </svg>
+        StatBid
+      </a>
+    </div>
+
+    <footer>
+      &copy; 2025 Roy Steves
+    </footer>
   </div>
 </body>
 </html>
