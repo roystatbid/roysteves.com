@@ -1,0 +1,411 @@
+/* ===================================================================
+   Roy Steves — roysteves.com
+   Shared styles for all pages
+   =================================================================== */
+
+:root {
+  /* Background / surfaces */
+  --bg-page: #16192a;
+  --bg-card: #252b42;
+
+  /* Text */
+  --text-primary: #f0ede6;
+  --text-body: #c4d0dc;
+  --text-secondary: #b8c8d8;
+
+  /* Accent: teal */
+  --accent-teal: #7eb8c9;
+
+  /* Accent: gold */
+  --accent-gold: #dfc98a;
+  --accent-gold-light: #eddfa8;
+  --accent-gold-fill: rgba(223, 201, 138, 0.08);
+  --accent-gold-border: rgba(223, 201, 138, 0.25);
+
+  /* Brand: Poolaroo */
+  --brand-poolaroo-text: #6cbfe0;
+  --brand-poolaroo-bg: rgba(26, 143, 209, 0.12);
+  --brand-poolaroo-border: rgba(108, 191, 224, 0.25);
+
+  /* Brand: StatBid */
+  --brand-statbid-text: #9ab8c6;
+  --brand-statbid-bg: rgba(126, 184, 201, 0.12);
+  --brand-statbid-border: rgba(154, 184, 198, 0.25);
+
+  /* Borders */
+  --border-subtle: rgba(184, 200, 216, 0.12);
+
+  /* Typography */
+  --font-serif: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+  --font-sans: system-ui, -apple-system, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-body);
+  line-height: 1.7;
+}
+
+/* ---- Layout ---- */
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+}
+
+/* ---- Site nav ---- */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.site-nav .site-name,
+.site-nav .site-name:visited {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.site-nav a,
+.site-nav a:visited {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--accent-teal);
+}
+
+/* ---- Typography ---- */
+
+h1 {
+  font-family: var(--font-sans);
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+
+/* ---- Divider ---- */
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent-gold-light), transparent);
+  margin: 0.5rem 0 2rem;
+  opacity: 0.3;
+}
+
+/* ---- Content ---- */
+
+.content p {
+  font-size: 1.05rem;
+  color: var(--text-body);
+  margin-bottom: 1.5rem;
+}
+
+a {
+  color: var(--accent-teal);
+}
+
+a:visited {
+  color: var(--accent-teal);
+}
+
+.highlight {
+  color: var(--accent-teal);
+}
+
+a.highlight {
+  text-decoration: none;
+}
+
+a.highlight:visited {
+  color: var(--accent-teal);
+}
+
+a.highlight:hover {
+  text-decoration: underline;
+}
+
+/* ---- Philosophy card ---- */
+
+.philosophy {
+  background: rgba(223, 201, 138, 0.12);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+}
+
+.philosophy p {
+  margin-bottom: 0;
+  color: var(--accent-gold-light);
+}
+
+/* ---- Link pills (homepage) ---- */
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.links a:hover {
+  border-color: var(--accent-teal);
+  transform: translateY(-1px);
+}
+
+.links a svg,
+.links a img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.links a img.icon-on-dark {
+  background: #fff;
+  border-radius: 50%;
+  padding: 2px;
+  opacity: 1;
+  width: 20px;
+  height: 20px;
+}
+
+/* Brand-specific pill styles */
+.links a[href*="poolaroo"] {
+  color: var(--brand-poolaroo-text);
+  background: var(--brand-poolaroo-bg);
+  border-color: var(--brand-poolaroo-border);
+}
+
+.links a[href*="statbid"] {
+  color: var(--brand-statbid-text);
+  background: var(--brand-statbid-bg);
+  border-color: var(--brand-statbid-border);
+}
+
+/* ---- Blog / listing cards ---- */
+
+.listing {
+  list-style: none;
+}
+
+.listing li {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.listing li:last-child {
+  border-bottom: none;
+}
+
+.listing a {
+  display: block;
+  padding: 1.25rem 0;
+  text-decoration: none;
+}
+
+.listing .title {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--accent-teal);
+}
+
+.listing .meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.listing .summary {
+  display: block;
+  font-size: 0.925rem;
+  color: var(--text-body);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* ---- Article (blog post) ---- */
+
+article h1 {
+  margin-bottom: 0.75rem;
+}
+
+article .article-meta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+article .article-body h2 {
+  text-transform: none;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+article .article-body h3 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+article .article-body p {
+  font-size: 1.05rem;
+  color: var(--text-body);
+  margin-bottom: 1.5rem;
+}
+
+article .article-body ul,
+article .article-body ol {
+  color: var(--text-body);
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+article .article-body li {
+  margin-bottom: 0.5rem;
+}
+
+article .article-body blockquote {
+  border-left: 3px solid var(--accent-gold);
+  padding-left: 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--text-primary);
+}
+
+article .article-body code {
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+article .article-body pre {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+article .article-body pre code {
+  background: none;
+  padding: 0;
+}
+
+article .article-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+article .article-body a {
+  color: var(--accent-teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+article .article-body a:visited {
+  color: var(--accent-teal);
+}
+
+article .article-body a:hover {
+  color: var(--text-primary);
+}
+
+/* ---- Footer ---- */
+
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-nav {
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Roy Steves</title>
+    <link>https://roysteves.com</link>
+    <description>Pool industry, ecommerce, AI, and building technology-forward businesses.</description>
+    <language>en-us</language>
+    <atom:link href="https://roysteves.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <!-- Add new posts at the top. Example:
+    <item>
+      <title>Post Title</title>
+      <link>https://roysteves.com/blog/post-slug.html</link>
+      <guid>https://roysteves.com/blog/post-slug.html</guid>
+      <pubDate>Wed, 02 Apr 2026 00:00:00 GMT</pubDate>
+      <description>A short summary of the post.</description>
+    </item>
+    -->
+  </channel>
+</rss>

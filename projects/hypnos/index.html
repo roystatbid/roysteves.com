@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hypnos — Harmonic Drone Synthesizer</title>
+  <meta name="description" content="Hypnos is a free browser-based harmonic drone synthesizer for meditation, focus, or sleep. Features just-intonation tuning, per-channel LFOs, stereo panning, and a 30-minute sleep timer.">
+  <link rel="canonical" href="https://roysteves.com/projects/hypnos/">
+
+  <meta property="og:title" content="Hypnos — Harmonic Drone Synthesizer">
+  <meta property="og:description" content="A free browser-based harmonic drone synthesizer for meditation, focus, or sleep. Features just-intonation tuning, per-channel LFOs, and stereo panning.">
+  <meta property="og:url" content="https://roysteves.com/projects/hypnos/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Roy Steves">
+
+
+
+  <style>
+    :root {
+      --bg-primary: #0a0a12;
+      --bg-secondary: #12121f;
+      --bg-tertiary: #1a1a2e;
+      --text-primary: #e8e8f0;
+      --text-secondary: #7a7a9a;
+      --text-dim: #4a4a66;
+      --accent-play: #00ff88;
+      --accent-stop: #e94560;
+      --accent-warm: #feca57;
+      --accent-cool: #00b4d8;
+      --accent-pink: #ff6b9d;
+      --thumb: #e8e8f0;
+      --border-radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .app-container { max-width: 480px; margin: 0 auto; }
+
+    /* ---- Header ---- */
+    .header {
+      margin-bottom: 20px;
+      padding: 0 4px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header .tagline {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---- Transport ---- */
+    .transport {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: filter 0.15s ease;
+    }
+
+    .btn:active { filter: brightness(0.85); }
+
+    .btn-play {
+      background: var(--accent-play);
+      color: var(--bg-primary);
+      min-width: 80px;
+    }
+
+    .btn-play.playing {
+      background: var(--accent-stop);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .btn-sleep, .btn-mood { opacity: 0.3; pointer-events: none; }
+    .btn-sleep.enabled { opacity: 1; pointer-events: auto; }
+    .btn-mood.enabled { opacity: 1; pointer-events: auto; }
+    .btn-sleep { background: var(--bg-tertiary); color: var(--accent-cool); border: 1px solid rgba(0,180,216,0.2); }
+    .btn-sleep.enabled { background: linear-gradient(135deg, #0077b6, #00b4d8); color: var(--text-primary); border-color: transparent; }
+    .btn-sleep.active { background: var(--accent-stop); color: var(--text-primary); animation: pulse 2s infinite; border-color: transparent; }
+    .btn-mood { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.06); }
+    .btn-mood.enabled { background: linear-gradient(135deg, #e94560, #feca57, #00b4d8, #ff6b9d); color: var(--bg-primary); font-weight: 700; border-color: transparent; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+    /* ---- Settings row ---- */
+    .settings {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius);
+    }
+
+    .settings label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .settings select {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+    }
+
+    .settings .freq {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .settings .divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.65rem;
+      border-radius: 6px;
+    }
+
+    /* ---- Mood overlay ---- */
+    #moodOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      cursor: none;
+      transition: background-color 0.15s ease;
+    }
+    #moodOverlay.active { display: block; }
+
+    /* ---- Channel strips ---- */
+    .channels { display: flex; flex-direction: column; gap: 4px; }
+
+    .channel {
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .channel-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .channel-label {
+      flex-shrink: 0;
+      min-width: 72px;
+    }
+
+    .channel-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .channel-info {
+      font-family: monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .channel-main input[type="range"] {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+    }
+
+    .channel-main input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      background: var(--accent-play);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,255,136,0.4);
+    }
+
+    .channel-vol-val {
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--accent-play);
+      min-width: 24px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .channel-expand {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      cursor: pointer;
+      padding: 0 16px 0 0;
+      flex-shrink: 0;
+    }
+
+    .channel-expand .arrow {
+      display: inline-block;
+      transition: transform 0.2s ease;
+      font-size: 0.5rem;
+    }
+
+    .channel.open .channel-expand .arrow {
+      transform: rotate(180deg);
+    }
+
+    /* ---- LFO detail panel ---- */
+    .channel-detail {
+      display: none;
+      padding: 0 16px 14px;
+    }
+
+    .channel.open .channel-detail {
+      display: block;
+    }
+
+    .lfo-section {
+      margin-top: 10px;
+    }
+
+    .lfo-section-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .lfo-section-label.amp { color: var(--accent-warm); opacity: 0.7; }
+    .lfo-section-label.pan { color: var(--accent-pink); opacity: 0.7; }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .slider-row:last-child { margin-bottom: 0; }
+
+    .slider-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      width: 44px;
+      flex-shrink: 0;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+    }
+
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .slider-row input.amp-rate-slider::-webkit-slider-thumb {
+      background: var(--accent-warm);
+      box-shadow: 0 0 6px rgba(254,202,87,0.4);
+    }
+
+    .slider-row input.amp-depth-slider::-webkit-slider-thumb {
+      background: var(--accent-cool);
+      box-shadow: 0 0 6px rgba(0,180,216,0.4);
+    }
+
+    .slider-row input.pan-rate-slider::-webkit-slider-thumb {
+      background: var(--accent-pink);
+      box-shadow: 0 0 6px rgba(255,107,157,0.4);
+    }
+
+    .slider-row input.pan-depth-slider::-webkit-slider-thumb {
+      background: var(--accent-pink);
+      box-shadow: 0 0 6px rgba(255,107,157,0.4);
+    }
+
+    .slider-value {
+      font-family: monospace;
+      font-size: 0.6rem;
+      min-width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .slider-value.amp-rate-val { color: var(--accent-warm); }
+    .slider-value.amp-depth-val { color: var(--accent-cool); }
+    .slider-value.pan-rate-val { color: var(--accent-pink); }
+    .slider-value.pan-depth-val { color: var(--accent-pink); }
+
+    /* ---- Status ---- */
+    .status-bar {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+    .status-bar.running { color: var(--accent-play); }
+
+    /* ---- Accordion sections ---- */
+    .accordion {
+      margin-top: 12px;
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .accordion + .accordion { margin-top: 4px; }
+
+    .accordion-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    .accordion-toggle .arrow {
+      transition: transform 0.2s ease;
+      font-size: 0.5rem;
+    }
+
+    .accordion.open .accordion-toggle .arrow {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 0 16px 16px;
+    }
+
+    .accordion.open .accordion-content {
+      display: block;
+    }
+
+    .accordion-content dt {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .accordion-content dt.dt-vol { color: var(--accent-play); }
+    .accordion-content dt.dt-amp { color: var(--accent-warm); }
+    .accordion-content dt.dt-pan { color: var(--accent-pink); }
+    .accordion-content dt.dt-sleep { color: var(--accent-cool); }
+    .accordion-content dt.dt-mood { background: linear-gradient(90deg, #e94560, #feca57, #00b4d8, #ff6b9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .accordion-content dd {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-left: 0;
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .preset-row select {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1>Hypnos</h1>
+      <p class="tagline">Harmonic drone synthesizer for meditation, focus, or sleep</p>
+    </div>
+
+    <div class="transport">
+      <button id="playBtn" class="btn btn-play">Play</button>
+      <button id="randomizeBtn" class="btn btn-secondary">Random</button>
+      <button id="sleepBtn" class="btn btn-sleep">Sleep</button>
+      <button id="moodBtn" class="btn btn-mood">Mood</button>
+    </div>
+
+    <div class="settings">
+      <label>Root</label>
+      <select id="rootNote"></select>
+      <span class="freq" id="rootFreqDisplay">37 Hz</span>
+    </div>
+
+    <div class="channels" id="channelContainer"></div>
+    <div class="status-bar" id="statusBar">Ready</div>
+
+    <div class="accordion" id="presetsAccordion">
+      <button class="accordion-toggle" id="presetsToggle">
+        <span>Presets</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="accordion-content">
+        <div class="preset-row">
+          <select id="presetSelect"><option value="">Load a preset...</option></select>
+          <button class="btn btn-secondary btn-sm" id="savePreset">Save</button>
+          <button class="btn btn-secondary btn-sm" id="deletePreset">Del</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion" id="legendAccordion">
+      <button class="accordion-toggle" id="legendToggle">
+        <span>How it works</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="accordion-content">
+        <dl>
+          <dt>Channels</dt>
+          <dd>Each channel plays a sine wave at a harmonic of the root note. "Root" is the fundamental; higher harmonics add richness and texture.</dd>
+
+          <dt class="dt-vol">Volume</dt>
+          <dd>Base loudness of each channel. Drag to mix the harmonic balance.</dd>
+
+          <dt class="dt-amp">Amplitude (wobble)</dt>
+          <dd><strong>Rate</strong> — how fast the volume pulses. <strong>Depth</strong> — how dramatic the pulsing is. Both at zero = steady tone.</dd>
+
+          <dt class="dt-pan">Pan (stereo sweep)</dt>
+          <dd><strong>Rate</strong> — how fast sound moves between speakers. <strong>Depth</strong> — how wide the sweep is. Creates spatial movement.</dd>
+
+          <dt class="dt-sleep">Sleep</dt>
+          <dd>Fades to silence over 30 minutes, then stops. Tap again to cancel.</dd>
+
+          <dt class="dt-mood">Mood</dt>
+          <dd>Fullscreen color wash that responds to the audio. Tap or press Escape to exit.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div id="moodOverlay"></div>
+
+  <script>
+    const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const MAX_LFO_RATE = 10;
+
+    const CHANNELS = [
+      { name: 'Fundamental', label: '1:1', ratio: 1 },
+      { name: '2nd Harmonic', label: '2:1', ratio: 2 },
+      { name: '3rd Harmonic', label: '3:1', ratio: 3 },
+      { name: '4th Harmonic', label: '4:1', ratio: 4 },
+      { name: '6th Harmonic', label: '6:1', ratio: 6 },
+      { name: '8th Harmonic', label: '8:1', ratio: 8 },
+    ];
+
+    const DEFAULTS = [
+      { vol: 75, rate: 0,  depth: 0,  panRate: 12, panDepth: 38 },
+      { vol: 23, rate: 15, depth: 61, panRate: 22, panDepth: 56 },
+      { vol: 25, rate: 15, depth: 20, panRate: 10, panDepth: 72 },
+      { vol: 14, rate: 13, depth: 68, panRate: 23, panDepth: 78 },
+      { vol: 0,  rate: 0,  depth: 0,  panRate: 0,  panDepth: 0  },
+      { vol: 6,  rate: 8,  depth: 92, panRate: 42, panDepth: 59 },
+    ];
+
+    function sliderToLfoRate(v) { return v === 0 ? 0 : MAX_LFO_RATE * Math.pow(v / 100, 3); }
+    function formatLfoRate(r) { return r === 0 ? 'Off' : r < 0.1 ? (1/r).toFixed(0) + 's' : r.toFixed(1); }
+    function noteToFreq(n, o) { return 440 * Math.pow(2, ((o - 4) * 12 + (NOTES.indexOf(n) - 9)) / 12); }
+
+    class DroneEngine {
+      constructor() {
+        this.audioContext = null;
+        this.masterGain = null;
+        this.channels = [];
+        this.isRunning = false;
+        this.rootFreq = 36.71;
+      }
+
+      init() {
+        this.audioContext = new AudioContext();
+        this.masterGain = this.audioContext.createGain();
+        this.masterGain.gain.value = 1.0;
+        this.masterGain.connect(this.audioContext.destination);
+        for (let i = 0; i < CHANNELS.length; i++) this.channels.push(this.createChannel(CHANNELS[i].ratio));
+      }
+
+      createChannel(ratio) {
+        const osc = this.audioContext.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = this.rootFreq * ratio;
+        const gain = this.audioContext.createGain();
+        gain.gain.value = 0;
+        const panner = this.audioContext.createStereoPanner();
+        panner.pan.value = 0;
+        const lfo = this.audioContext.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0;
+        const lfoGain = this.audioContext.createGain();
+        lfoGain.gain.value = 0;
+        const panLfo = this.audioContext.createOscillator();
+        panLfo.type = 'sine';
+        panLfo.frequency.value = 0;
+        const panLfoGain = this.audioContext.createGain();
+        panLfoGain.gain.value = 0;
+        osc.connect(gain);
+        gain.connect(panner);
+        panner.connect(this.masterGain);
+        lfo.connect(lfoGain);
+        lfoGain.connect(gain.gain);
+        panLfo.connect(panLfoGain);
+        panLfoGain.connect(panner.pan);
+        return { osc, gain, panner, lfo, lfoGain, panLfo, panLfoGain, ratio };
+      }
+
+      start() {
+        if (this.audioContext.state === 'suspended') this.audioContext.resume();
+        this.channels.forEach(c => { c.osc.start(); c.lfo.start(); c.panLfo.start(); });
+        this.isRunning = true;
+      }
+
+      stop() {
+        const ratios = this.channels.map(c => c.ratio);
+        this.channels.forEach(c => { c.osc.stop(); c.lfo.stop(); c.panLfo.stop(); });
+        this.channels = [];
+        ratios.forEach(r => this.channels.push(this.createChannel(r)));
+        this.isRunning = false;
+      }
+
+      setRootFreq(f) {
+        this.rootFreq = f;
+        this.channels.forEach(c => {
+          const freq = f * c.ratio;
+          this.isRunning ? c.osc.frequency.setTargetAtTime(freq, this.audioContext.currentTime, 0.1) : c.osc.frequency.value = freq;
+        });
+      }
+
+      setVolume(i, v) {
+        if (!this.channels[i]) return;
+        this.isRunning ? this.channels[i].gain.gain.setTargetAtTime(v, this.audioContext.currentTime, 0.05) : this.channels[i].gain.gain.value = v;
+      }
+
+      setLfoRate(i, r) {
+        if (!this.channels[i]) return;
+        this.isRunning ? this.channels[i].lfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05) : this.channels[i].lfo.frequency.value = r;
+      }
+
+      setLfoDepth(i, d, v) {
+        if (!this.channels[i]) return;
+        const amt = v * d;
+        this.isRunning ? this.channels[i].lfoGain.gain.setTargetAtTime(amt, this.audioContext.currentTime, 0.05) : this.channels[i].lfoGain.gain.value = amt;
+      }
+
+      setPanLfoRate(i, r) {
+        if (!this.channels[i]) return;
+        this.isRunning ? this.channels[i].panLfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05) : this.channels[i].panLfo.frequency.value = r;
+      }
+
+      setPanLfoDepth(i, d) {
+        if (!this.channels[i]) return;
+        this.isRunning ? this.channels[i].panLfoGain.gain.setTargetAtTime(d, this.audioContext.currentTime, 0.05) : this.channels[i].panLfoGain.gain.value = d;
+      }
+
+      getFreq(i) { return this.rootFreq * (this.channels[i]?.ratio || 1); }
+    }
+
+    const engine = new DroneEngine();
+    const states = [];
+
+    function createChannel(i) {
+      const ch = document.createElement('div');
+      ch.className = 'channel';
+
+      const def = DEFAULTS[i];
+      states[i] = { vol: def.vol / 100, rate: sliderToLfoRate(def.rate), depth: def.depth / 100, panRate: sliderToLfoRate(def.panRate), panDepth: def.panDepth / 100 };
+
+      const freq = engine.getFreq(i).toFixed(0);
+
+      ch.innerHTML = `
+        <div class="channel-main">
+          <div class="channel-label">
+            <div class="channel-name">${CHANNELS[i].name}</div>
+            <div class="channel-info">${CHANNELS[i].label} · <span class="ch-freq">${freq} Hz</span></div>
+          </div>
+          <input type="range" class="vol-slider" min="0" max="100" value="${def.vol}">
+          <span class="channel-vol-val vol-val">${def.vol}</span>
+          <button class="channel-expand"><span class="arrow">&#9660;</span></button>
+        </div>
+        <div class="channel-detail">
+          <div class="lfo-section">
+            <div class="lfo-section-label amp">Amplitude</div>
+            <div class="slider-row">
+              <span class="slider-label">Rate</span>
+              <input type="range" class="amp-rate-slider" min="0" max="100" value="${def.rate}">
+              <span class="slider-value amp-rate-val">${formatLfoRate(states[i].rate)}</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">Depth</span>
+              <input type="range" class="amp-depth-slider" min="0" max="100" value="${def.depth}">
+              <span class="slider-value amp-depth-val">${def.depth}</span>
+            </div>
+          </div>
+          <div class="lfo-section">
+            <div class="lfo-section-label pan">Stereo Pan</div>
+            <div class="slider-row">
+              <span class="slider-label">Rate</span>
+              <input type="range" class="pan-rate-slider" min="0" max="100" value="${def.panRate}">
+              <span class="slider-value pan-rate-val">${formatLfoRate(states[i].panRate)}</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">Depth</span>
+              <input type="range" class="pan-depth-slider" min="0" max="100" value="${def.panDepth}">
+              <span class="slider-value pan-depth-val">${def.panDepth}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Expand/collapse
+      ch.querySelector('.channel-expand').addEventListener('click', () => ch.classList.toggle('open'));
+
+      const volSlider = ch.querySelector('.vol-slider');
+      const volVal = ch.querySelector('.vol-val');
+      volSlider.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        states[i].vol = v / 100;
+        engine.setVolume(i, v / 100);
+        volVal.textContent = v;
+        engine.setLfoDepth(i, states[i].depth, states[i].vol);
+      });
+
+      const rateSlider = ch.querySelector('.amp-rate-slider');
+      const rateVal = ch.querySelector('.amp-rate-val');
+      rateSlider.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        states[i].rate = sliderToLfoRate(v);
+        engine.setLfoRate(i, states[i].rate);
+        rateVal.textContent = formatLfoRate(states[i].rate);
+      });
+
+      const depthSlider = ch.querySelector('.amp-depth-slider');
+      const depthVal = ch.querySelector('.amp-depth-val');
+      depthSlider.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        states[i].depth = v / 100;
+        engine.setLfoDepth(i, states[i].depth, states[i].vol);
+        depthVal.textContent = v;
+      });
+
+      const panRateSlider = ch.querySelector('.pan-rate-slider');
+      const panRateVal = ch.querySelector('.pan-rate-val');
+      panRateSlider.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        states[i].panRate = sliderToLfoRate(v);
+        engine.setPanLfoRate(i, states[i].panRate);
+        panRateVal.textContent = formatLfoRate(states[i].panRate);
+      });
+
+      const panDepthSlider = ch.querySelector('.pan-depth-slider');
+      const panDepthVal = ch.querySelector('.pan-depth-val');
+      panDepthSlider.addEventListener('input', e => {
+        const v = parseInt(e.target.value);
+        states[i].panDepth = v / 100;
+        engine.setPanLfoDepth(i, states[i].panDepth);
+        panDepthVal.textContent = v;
+      });
+
+      return ch;
+    }
+
+    function updateFreqs() {
+      document.getElementById('rootFreqDisplay').textContent = engine.rootFreq.toFixed(0) + ' Hz';
+      document.querySelectorAll('.channel').forEach((ch, i) => {
+        ch.querySelector('.ch-freq').textContent = engine.getFreq(i).toFixed(0) + ' Hz';
+      });
+    }
+
+    function randomize() {
+      document.querySelectorAll('.channel').forEach((ch, i) => {
+        const slider = ch.querySelector('.vol-slider');
+        const val = ch.querySelector('.vol-val');
+        const v = Math.floor(Math.pow(Math.random(), 1.5) * 100);
+        slider.value = v;
+        states[i].vol = v / 100;
+        engine.setVolume(i, v / 100);
+        val.textContent = v;
+        engine.setLfoDepth(i, states[i].depth, states[i].vol);
+      });
+    }
+
+    function restore() {
+      states.forEach((s, i) => {
+        engine.setVolume(i, s.vol);
+        engine.setLfoRate(i, s.rate);
+        engine.setLfoDepth(i, s.depth, s.vol);
+        engine.setPanLfoRate(i, s.panRate);
+        engine.setPanLfoDepth(i, s.panDepth);
+      });
+    }
+
+    function init() {
+      engine.init();
+      const rootSelect = document.getElementById('rootNote');
+      for (let o = 1; o <= 5; o++) {
+        for (const n of NOTES) {
+          const opt = document.createElement('option');
+          opt.value = `${n}${o}`;
+          opt.textContent = `${n}${o}`;
+          if (n === 'D' && o === 1) opt.selected = true;
+          rootSelect.appendChild(opt);
+        }
+      }
+      const container = document.getElementById('channelContainer');
+      for (let i = 0; i < CHANNELS.length; i++) container.appendChild(createChannel(i));
+      updateFreqs();
+    }
+
+    document.getElementById('rootNote').addEventListener('change', e => {
+      const v = e.target.value;
+      engine.setRootFreq(noteToFreq(v.slice(0, -1), parseInt(v.slice(-1))));
+      updateFreqs();
+    });
+
+    // Play/Stop toggle
+    const playBtn = document.getElementById('playBtn');
+    const sleepBtn = document.getElementById('sleepBtn');
+    const moodBtn = document.getElementById('moodBtn');
+
+    playBtn.addEventListener('click', () => {
+      if (engine.isRunning) {
+        engine.stop();
+        playBtn.textContent = 'Play';
+        playBtn.classList.remove('playing');
+        sleepBtn.classList.remove('enabled');
+        moodBtn.classList.remove('enabled');
+        document.getElementById('statusBar').textContent = 'Stopped';
+        document.getElementById('statusBar').classList.remove('running');
+        if (sleepTimeout) {
+          clearTimeout(sleepTimeout);
+          sleepTimeout = null;
+          sleepBtn.classList.remove('active');
+          sleepBtn.textContent = 'Sleep';
+        }
+        restore();
+      } else {
+        engine.start();
+        restore();
+        playBtn.textContent = 'Stop';
+        playBtn.classList.add('playing');
+        sleepBtn.classList.add('enabled');
+        moodBtn.classList.add('enabled');
+        document.getElementById('statusBar').textContent = 'Playing';
+        document.getElementById('statusBar').classList.add('running');
+      }
+    });
+
+    document.getElementById('randomizeBtn').addEventListener('click', randomize);
+
+    // Sleep
+    const SLEEP_DURATION = 30 * 60;
+    let sleepTimeout = null;
+
+    sleepBtn.addEventListener('click', () => {
+      const btn = sleepBtn;
+      if (sleepTimeout) {
+        clearTimeout(sleepTimeout);
+        sleepTimeout = null;
+        btn.classList.remove('active');
+        btn.textContent = 'Sleep';
+        engine.masterGain.gain.cancelScheduledValues(engine.audioContext.currentTime);
+        engine.masterGain.gain.setValueAtTime(1.0, engine.audioContext.currentTime);
+        return;
+      }
+
+      const now = engine.audioContext.currentTime;
+      engine.masterGain.gain.setValueAtTime(1.0, now);
+      engine.masterGain.gain.linearRampToValueAtTime(0, now + SLEEP_DURATION);
+
+      btn.classList.add('active');
+      btn.textContent = '30:00';
+
+      let remaining = SLEEP_DURATION;
+      const updateCountdown = () => {
+        remaining--;
+        if (remaining <= 0) {
+          playBtn.click(); // stop
+          btn.classList.remove('active');
+          btn.textContent = 'Sleep';
+          sleepTimeout = null;
+        } else {
+          const mins = Math.floor(remaining / 60);
+          const secs = remaining % 60;
+          btn.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+          sleepTimeout = setTimeout(updateCountdown, 1000);
+        }
+      };
+      sleepTimeout = setTimeout(updateCountdown, 1000);
+    });
+
+    // Accordions
+    document.querySelectorAll('.accordion-toggle').forEach(btn => {
+      btn.addEventListener('click', () => btn.closest('.accordion').classList.toggle('open'));
+    });
+
+    // Preset management
+    const STORAGE_KEY = 'hypnosPresets';
+
+    function getPresets() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function savePresets(presets) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    }
+
+    function getCurrentState() {
+      return {
+        root: document.getElementById('rootNote').value,
+        channels: states.map(s => ({
+          vol: Math.round(s.vol * 100),
+          rate: s.rate,
+          depth: Math.round(s.depth * 100),
+          panRate: s.panRate,
+          panDepth: Math.round(s.panDepth * 100)
+        }))
+      };
+    }
+
+    function applyState(state) {
+      document.getElementById('rootNote').value = state.root;
+      engine.setRootFreq(noteToFreq(state.root.slice(0, -1), parseInt(state.root.slice(-1))));
+
+      document.querySelectorAll('.channel').forEach((ch, i) => {
+        const cs = state.channels[i];
+        if (!cs) return;
+
+        const rate = typeof cs.rate === 'string' ? sliderToLfoRate(parseInt(cs.rate)) : cs.rate;
+        const panRate = typeof cs.panRate === 'string' ? sliderToLfoRate(parseInt(cs.panRate)) : cs.panRate;
+
+        states[i].vol = cs.vol / 100;
+        states[i].depth = cs.depth / 100;
+        states[i].rate = rate;
+        states[i].panRate = panRate;
+        states[i].panDepth = (cs.panDepth || 0) / 100;
+
+        const rateToSlider = r => r === 0 ? 0 : Math.round(Math.pow(r / MAX_LFO_RATE, 1/3) * 100);
+
+        ch.querySelector('.vol-slider').value = cs.vol;
+        ch.querySelector('.vol-val').textContent = cs.vol;
+        ch.querySelector('.amp-rate-slider').value = rateToSlider(states[i].rate);
+        ch.querySelector('.amp-rate-val').textContent = formatLfoRate(states[i].rate);
+        ch.querySelector('.amp-depth-slider').value = cs.depth;
+        ch.querySelector('.amp-depth-val').textContent = cs.depth;
+        ch.querySelector('.pan-rate-slider').value = rateToSlider(states[i].panRate);
+        ch.querySelector('.pan-rate-val').textContent = formatLfoRate(states[i].panRate);
+        ch.querySelector('.pan-depth-slider').value = cs.panDepth || 0;
+        ch.querySelector('.pan-depth-val').textContent = cs.panDepth || 0;
+
+        engine.setVolume(i, cs.vol / 100);
+        engine.setLfoRate(i, states[i].rate);
+        engine.setLfoDepth(i, cs.depth / 100, cs.vol / 100);
+        engine.setPanLfoRate(i, states[i].panRate);
+        engine.setPanLfoDepth(i, states[i].panDepth);
+      });
+      updateFreqs();
+    }
+
+    function refreshPresetList() {
+      const select = document.getElementById('presetSelect');
+      const presets = getPresets();
+      select.innerHTML = '<option value="">Load a preset...</option>';
+      Object.keys(presets).sort().forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById('presetSelect').addEventListener('change', e => {
+      if (!e.target.value) return;
+      const presets = getPresets();
+      if (presets[e.target.value]) applyState(presets[e.target.value]);
+    });
+
+    document.getElementById('savePreset').addEventListener('click', () => {
+      const name = prompt('Preset name:');
+      if (!name) return;
+      const presets = getPresets();
+      presets[name] = getCurrentState();
+      savePresets(presets);
+      refreshPresetList();
+      document.getElementById('presetSelect').value = name;
+    });
+
+    document.getElementById('deletePreset').addEventListener('click', () => {
+      const name = document.getElementById('presetSelect').value;
+      if (!name) return alert('Select a preset first');
+      if (!confirm(`Delete "${name}"?`)) return;
+      const presets = getPresets();
+      delete presets[name];
+      savePresets(presets);
+      refreshPresetList();
+    });
+
+    init();
+    refreshPresetList();
+
+    // === Mood Light ===
+    const moodOverlay = document.getElementById('moodOverlay');
+    let moodAnimId = null;
+    let moodActive = false;
+    let wakeLock = null;
+
+    function hslToRgb(h, s, l) {
+      h /= 360; s /= 100; l /= 100;
+      let r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1; if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    function moodFrame() {
+      if (!moodActive) return;
+      const t = engine.audioContext ? engine.audioContext.currentTime : performance.now() / 1000;
+      const hue = (t * 4) % 360;
+      let brightness = 0.25;
+      if (engine.isRunning && engine.channels[0]) {
+        const gainVal = engine.channels[0].gain.gain.value;
+        brightness = 0.10 + Math.min(gainVal, 1) * 0.40;
+      }
+      const [r, g, b] = hslToRgb(hue, 70, brightness * 100);
+      moodOverlay.style.backgroundColor = `rgb(${r},${g},${b})`;
+      moodAnimId = requestAnimationFrame(moodFrame);
+    }
+
+    function enterMood() {
+      moodActive = true;
+      moodOverlay.classList.add('active');
+      moodOverlay.requestFullscreen?.() || moodOverlay.webkitRequestFullscreen?.();
+      moodAnimId = requestAnimationFrame(moodFrame);
+      navigator.wakeLock?.request('screen').then(wl => { wakeLock = wl; }).catch(() => {});
+    }
+
+    function exitMood() {
+      moodActive = false;
+      moodOverlay.classList.remove('active');
+      if (moodAnimId) cancelAnimationFrame(moodAnimId);
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    }
+
+    moodBtn.addEventListener('click', enterMood);
+    moodOverlay.addEventListener('click', exitMood);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && moodActive) exitMood();
+    });
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && moodActive) exitMood();
+    });
+  </script>
+</body>
+</html>
