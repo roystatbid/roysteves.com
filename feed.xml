@@ -6,14 +6,12 @@
     <description>Pool industry, ecommerce, AI, and building technology-forward businesses.</description>
     <language>en-us</language>
     <atom:link href="https://roysteves.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <!-- Add new posts at the top. Example:
     <item>
-      <title>Post Title</title>
-      <link>https://roysteves.com/blog/post-slug.html</link>
-      <guid>https://roysteves.com/blog/post-slug.html</guid>
-      <pubDate>Wed, 02 Apr 2026 00:00:00 GMT</pubDate>
-      <description>A short summary of the post.</description>
+      <title>ChatGPT Mistook our Shopify PDP as Out of Stock</title>
+      <link>https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html</link>
+      <guid>https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html</guid>
+      <pubDate>Thu, 10 Apr 2026 00:00:00 GMT</pubDate>
+      <description>A hidden 'Backordered' status label in our Shopify theme was confusing ChatGPT's product discovery. Here's how I found it and fixed it.</description>
     </item>
-    -->
   </channel>
 </rss>

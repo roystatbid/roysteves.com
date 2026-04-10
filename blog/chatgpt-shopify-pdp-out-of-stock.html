@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ChatGPT Mistook our Shopify PDP as Out of Stock — Roy Steves</title>
+  <meta name="description" content="A hidden 'Backordered' status label in our Shopify theme was confusing ChatGPT's product discovery. Here's how I found it and fixed it before competitors caught on.">
+  <link rel="canonical" href="https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ChatGPT Mistook our Shopify PDP as Out of Stock — Roy Steves">
+  <meta property="og:description" content="A hidden 'Backordered' status label in our Shopify theme was confusing ChatGPT's product discovery. Here's how I found it and fixed it.">
+  <meta property="og:url" content="https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Roy Steves">
+  <meta property="article:published_time" content="2026-04-10">
+
+  <!-- Structured data (Article) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ChatGPT Mistook our Shopify PDP as Out of Stock",
+    "description": "A hidden 'Backordered' status label in our Shopify theme was confusing ChatGPT's product discovery. Here's how I found it and fixed it before competitors caught on.",
+    "url": "https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html",
+    "datePublished": "2026-04-10",
+    "author": {
+      "@type": "Person",
+      "name": "Roy Steves",
+      "url": "https://roysteves.com"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Roy Steves",
+      "url": "https://roysteves.com"
+    }
+  }
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Roy Steves" href="https://roysteves.com/feed.xml">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <nav class="site-nav">
+      <a href="../index.html" class="site-name">Roy Steves</a>
+      <a href="./index.html" aria-current="page">Blog</a>
+      <a href="../projects/index.html">Projects</a>
+      <a href="../about.html">About</a>
+    </nav>
+
+    <article>
+      <h1>ChatGPT Mistook our Shopify PDP as Out of Stock</h1>
+      <p class="article-meta">
+        <time datetime="2026-04-10">April 10, 2026</time>
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="article-body">
+        <p>Google's spent decades figuring out how to interpret webpages, and they've gotten especially good at figuring out how page content will be viewed by actual human visitors. This is why ye olde tiny-white-text keyword stuffing from 2002 doesn't work anymore, for example.</p>
+
+        <p>With Google building all of those advanced crawling techniques, all of the systems that Ecommerce technologists build assume that's what discovery bots will do! But the page interpreters built into LLM platforms don't have the benefit of those many, many years of iteration and innovation that Google's bots enjoy.</p>
+
+        <p>So, when Shopify sent out an email announcement stating "Your products can be discovered and purchased in ChatGPT", I was excited and a bit confused. I knew that OpenAI basically abandoned the previous integration with Shopify that they'd announced, and their commission-based advertising model was apparently dead in the water. So this had to be Shopify building something from <em>their</em> end? I had to experiment!</p>
+
+        <p>And sure enough, ChatGPT could browse what seemed to be a simplified, cached version of Shopify's Shop App shopping interface. However, I noticed that ChatGPT got confused regarding the stock status of a product on Poolaroo's product detail page.</p>
+
+        <p>I was testing how it responded to our page for an <a href="https://poolaroo.com/products/superior-automatic-pool-pump-2100-max-gph-25-cord-92935" target="_blank" rel="noopener">automatic pool cover pump</a>, which was very much in-stock (over 500 units at the time), and showed a reassuring green dot and "In stock, ready to ship" right above the Add to Cart button. But ChatGPT was reporting confusion over <em>also</em> seeing "Backordered, shipping soon."</p>
+
+        <p>But we don't even <em>use</em> a Backordered status! So I checked the rendered source code, and found this:</p>
+
+        <img src="./img/false_backorder.png" alt="HTML source code showing a span element containing 'Backordered, shipping soon' hidden in the Shopify theme template">
+
+        <p>So, the theme was loading all possible values, and then selecting which one to display at pageload! Given the way that the Shopify platform works, and how themes and apps layer on top of that, this wasn't shocking, but while it wasn't an issue in the Googlebot era, it was clearly confusing the greenhorn AI, which was nudging it away from our site, in favor of competitors where availability signals were unambiguous.</p>
+
+        <p>Given that we could see the actual availability within the load of the product detail page (PDP) template, I was able to <em>only</em> populate that span <em>if</em> the item was out of stock, and after letting the update propagate across Shopify's CDN, ChatGPT confirmed that the stock status was no longer confusing it.</p>
+
+        <img src="./img/in_stock.png" alt="ChatGPT confirming the product is unambiguously in stock after the template fix">
+
+        <p>Shopify and theme developers will catch up with these quirks, over time, and I'm sure the LLMs will continue to iterate toward the level of sophistication that Google's bots have achieved, but in the meantime, there seem to be a thousand little gaps between what our existing systems expect, and how these emerging shopping experiences actually behave.</p>
+
+        <p>While that means that we have a lot of work to do, I try to remember that every pain that we fix is a competitive advantage if our competitors can't or won't fix it, too.</p>
+      </div>
+    </article>
+
+    <footer>
+      © 2026 Roy Steves
+    </footer>
+  </div>
+</body>
+</html>
