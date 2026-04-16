@@ -503,7 +503,7 @@
       </div>
     </div>
 
-    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.7</div>
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.8</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -649,9 +649,14 @@
             c.panner.connect(this.masterGain);
             c.connected = true;
           }
-          c.gain.gain.setTargetAtTime(v, t, 0.05);
+          // Recalculate gain with LFO offset
+          const d = states[i].depth;
+          const halfSwing = v * d / 2;
+          c.gain.gain.setTargetAtTime(v - halfSwing, t, 0.05);
+          c.lfoGain.gain.setTargetAtTime(halfSwing, t, 0.05);
         } else if (v === 0) {
           c.gain.gain.setTargetAtTime(0, t, 0.05);
+          c.lfoGain.gain.setTargetAtTime(0, t, 0.05);
           // Disconnect after fade-out to save processing
           if (c.connected) {
             setTimeout(() => {
@@ -673,9 +678,11 @@
       setLfoDepth(i, d, v) {
         const c = this.channels[i];
         if (!c) return;
-        // Cap LFO amplitude so channel gain never exceeds 1.0
-        const amt = Math.min(v * d, 1.0 - v);
-        c.lfoGain.gain.setTargetAtTime(amt, this.audioContext.currentTime, 0.05);
+        const t = this.audioContext.currentTime;
+        // LFO dips below volume, never above: ceiling = v, floor = v * (1 - d)
+        const halfSwing = v * d / 2;
+        c.gain.gain.setTargetAtTime(v - halfSwing, t, 0.05);
+        c.lfoGain.gain.setTargetAtTime(halfSwing, t, 0.05);
       }
 
       setPanLfoRate(i, r) {
