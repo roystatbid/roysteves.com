@@ -503,7 +503,7 @@
       </div>
     </div>
 
-    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.5</div>
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.6</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -544,9 +544,18 @@
 
       init() {
         this.audioContext = new AudioContext({ latencyHint: 'playback' });
+        // Compressor prevents clipping when multiple channels stack
+        const compressor = this.audioContext.createDynamicsCompressor();
+        compressor.threshold.value = -6;   // start compressing 6dB below max
+        compressor.knee.value = 12;        // soft knee for gentle onset
+        compressor.ratio.value = 8;        // firm limiting above threshold
+        compressor.attack.value = 0.003;   // fast attack to catch peaks
+        compressor.release.value = 0.15;   // smooth release
+        compressor.connect(this.audioContext.destination);
+
         this.masterGain = this.audioContext.createGain();
         this.masterGain.gain.value = 1.0;
-        this.masterGain.connect(this.audioContext.destination);
+        this.masterGain.connect(compressor);
 
         // Pre-create all nodes at init — no allocation during playback
         for (let i = 0; i < CHANNELS.length; i++) {
