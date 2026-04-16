@@ -503,7 +503,7 @@
       </div>
     </div>
 
-    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.6</div>
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.7</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -673,7 +673,9 @@
       setLfoDepth(i, d, v) {
         const c = this.channels[i];
         if (!c) return;
-        c.lfoGain.gain.setTargetAtTime(v * d, this.audioContext.currentTime, 0.05);
+        // Cap LFO amplitude so channel gain never exceeds 1.0
+        const amt = Math.min(v * d, 1.0 - v);
+        c.lfoGain.gain.setTargetAtTime(amt, this.audioContext.currentTime, 0.05);
       }
 
       setPanLfoRate(i, r) {
