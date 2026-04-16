@@ -503,7 +503,7 @@
       </div>
     </div>
 
-    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.3</div>
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.4</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -551,9 +551,12 @@
         // Pre-create all nodes at init — no allocation during playback
         for (let i = 0; i < CHANNELS.length; i++) {
           const ratio = CHANNELS[i].ratio;
+          // Slight random detuning (±0.3 Hz) per channel to avoid
+          // Bluetooth codec artifacts from perfectly harmonic signals
+          const detune = (Math.random() - 0.5) * 0.6;
           const osc = this.audioContext.createOscillator();
           osc.type = 'sine';
-          osc.frequency.value = this.rootFreq * ratio;
+          osc.frequency.value = this.rootFreq * ratio + detune;
 
           const gain = this.audioContext.createGain();
           gain.gain.value = 0;
@@ -588,7 +591,7 @@
           lfo.start();
           panLfo.start();
 
-          this.channels.push({ osc, gain, panner, lfo, lfoGain, panLfo, panLfoGain, ratio, connected: false });
+          this.channels.push({ osc, gain, panner, lfo, lfoGain, panLfo, panLfoGain, ratio, detune, connected: false });
         }
       }
 
@@ -615,7 +618,7 @@
         this.rootFreq = f;
         const t = this.audioContext.currentTime;
         this.channels.forEach(c => {
-          c.osc.frequency.setTargetAtTime(f * c.ratio, t, 0.1);
+          c.osc.frequency.setTargetAtTime(f * c.ratio + c.detune, t, 0.1);
         });
       }
 
