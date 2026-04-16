@@ -502,6 +502,8 @@
         </dl>
       </div>
     </div>
+
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.3</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -545,86 +547,49 @@
         this.masterGain = this.audioContext.createGain();
         this.masterGain.gain.value = 1.0;
         this.masterGain.connect(this.audioContext.destination);
-        for (let i = 0; i < CHANNELS.length; i++) this.channels.push(this.createChannel(CHANNELS[i].ratio));
-      }
 
-      createChannel(ratio) {
-        return { ratio, osc: null, gain: null, panner: null, lfo: null, lfoGain: null, panLfo: null, panLfoGain: null, active: false, lfoActive: false, panLfoActive: false };
-      }
+        // Pre-create all nodes at init — no allocation during playback
+        for (let i = 0; i < CHANNELS.length; i++) {
+          const ratio = CHANNELS[i].ratio;
+          const osc = this.audioContext.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = this.rootFreq * ratio;
 
-      // Spin up audio nodes for a channel on demand
-      _activate(i) {
-        const c = this.channels[i];
-        if (c.active) return;
-        const osc = this.audioContext.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = this.rootFreq * c.ratio;
-        const gain = this.audioContext.createGain();
-        gain.gain.value = 0;
-        const panner = this.audioContext.createStereoPanner();
-        panner.pan.value = 0;
-        osc.connect(gain);
-        gain.connect(panner);
-        panner.connect(this.masterGain);
-        osc.start();
-        c.osc = osc; c.gain = gain; c.panner = panner;
-        c.active = true;
-      }
+          const gain = this.audioContext.createGain();
+          gain.gain.value = 0;
 
-      _deactivate(i) {
-        const c = this.channels[i];
-        if (!c.active) return;
-        this._deactivateLfo(i);
-        this._deactivatePanLfo(i);
-        c.osc.stop();
-        c.osc = null; c.gain = null; c.panner = null;
-        c.active = false;
-      }
+          const panner = this.audioContext.createStereoPanner();
+          panner.pan.value = 0;
 
-      _activateLfo(i) {
-        const c = this.channels[i];
-        if (c.lfoActive || !c.active) return;
-        const lfo = this.audioContext.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0;
-        const lfoGain = this.audioContext.createGain();
-        lfoGain.gain.value = 0;
-        lfo.connect(lfoGain);
-        lfoGain.connect(c.gain.gain);
-        lfo.start();
-        c.lfo = lfo; c.lfoGain = lfoGain;
-        c.lfoActive = true;
-      }
+          const lfo = this.audioContext.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0;
+          const lfoGain = this.audioContext.createGain();
+          lfoGain.gain.value = 0;
 
-      _deactivateLfo(i) {
-        const c = this.channels[i];
-        if (!c.lfoActive) return;
-        c.lfo.stop();
-        c.lfo = null; c.lfoGain = null;
-        c.lfoActive = false;
-      }
+          const panLfo = this.audioContext.createOscillator();
+          panLfo.type = 'sine';
+          panLfo.frequency.value = 0;
+          const panLfoGain = this.audioContext.createGain();
+          panLfoGain.gain.value = 0;
 
-      _activatePanLfo(i) {
-        const c = this.channels[i];
-        if (c.panLfoActive || !c.active) return;
-        const panLfo = this.audioContext.createOscillator();
-        panLfo.type = 'sine';
-        panLfo.frequency.value = 0;
-        const panLfoGain = this.audioContext.createGain();
-        panLfoGain.gain.value = 0;
-        panLfo.connect(panLfoGain);
-        panLfoGain.connect(c.panner.pan);
-        panLfo.start();
-        c.panLfo = panLfo; c.panLfoGain = panLfoGain;
-        c.panLfoActive = true;
-      }
+          // Wire up: osc -> gain -> panner (NOT connected to master yet)
+          osc.connect(gain);
+          gain.connect(panner);
 
-      _deactivatePanLfo(i) {
-        const c = this.channels[i];
-        if (!c.panLfoActive) return;
-        c.panLfo.stop();
-        c.panLfo = null; c.panLfoGain = null;
-        c.panLfoActive = false;
+          // LFOs wired to their targets but at zero gain
+          lfo.connect(lfoGain);
+          lfoGain.connect(gain.gain);
+          panLfo.connect(panLfoGain);
+          panLfoGain.connect(panner.pan);
+
+          // Start all oscillators now — they produce silence until connected
+          osc.start();
+          lfo.start();
+          panLfo.start();
+
+          this.channels.push({ osc, gain, panner, lfo, lfoGain, panLfo, panLfoGain, ratio, connected: false });
+        }
       }
 
       start() {
@@ -633,84 +598,73 @@
       }
 
       stop() {
-        for (let i = 0; i < this.channels.length; i++) this._deactivate(i);
         this.isRunning = false;
+        // Disconnect all channels from output, zero gains
+        this.channels.forEach(c => {
+          if (c.connected) {
+            c.panner.disconnect();
+            c.connected = false;
+          }
+          c.gain.gain.value = 0;
+          c.lfoGain.gain.value = 0;
+          c.panLfoGain.gain.value = 0;
+        });
       }
 
       setRootFreq(f) {
         this.rootFreq = f;
+        const t = this.audioContext.currentTime;
         this.channels.forEach(c => {
-          if (c.active) {
-            c.osc.frequency.setTargetAtTime(f * c.ratio, this.audioContext.currentTime, 0.1);
-          }
+          c.osc.frequency.setTargetAtTime(f * c.ratio, t, 0.1);
         });
       }
 
       setVolume(i, v) {
-        if (!this.channels[i]) return;
+        const c = this.channels[i];
+        if (!c) return;
+        const t = this.audioContext.currentTime;
         if (v > 0 && this.isRunning) {
-          this._activate(i);
-          this.channels[i].gain.gain.setTargetAtTime(v, this.audioContext.currentTime, 0.05);
-        } else if (v === 0 && this.channels[i].active) {
-          this.channels[i].gain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.05);
-          // Deactivate after fade-out
-          setTimeout(() => {
-            if (this.channels[i] && states[i].vol === 0) this._deactivate(i);
-          }, 100);
-        } else if (!this.isRunning && this.channels[i].active) {
-          this.channels[i].gain.gain.value = v;
+          if (!c.connected) {
+            c.panner.connect(this.masterGain);
+            c.connected = true;
+          }
+          c.gain.gain.setTargetAtTime(v, t, 0.05);
+        } else if (v === 0) {
+          c.gain.gain.setTargetAtTime(0, t, 0.05);
+          // Disconnect after fade-out to save processing
+          if (c.connected) {
+            setTimeout(() => {
+              if (states[i].vol === 0 && c.connected) {
+                c.panner.disconnect();
+                c.connected = false;
+              }
+            }, 150);
+          }
         }
       }
 
       setLfoRate(i, r) {
         const c = this.channels[i];
-        if (!c || !c.active) return;
-        if (r > 0 && states[i].depth > 0) {
-          this._activateLfo(i);
-          c.lfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
-        } else if (c.lfoActive) {
-          c.lfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
-        }
+        if (!c) return;
+        c.lfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
       }
 
       setLfoDepth(i, d, v) {
         const c = this.channels[i];
-        if (!c || !c.active) return;
-        const amt = v * d;
-        if (amt > 0) {
-          this._activateLfo(i);
-          c.lfoGain.gain.setTargetAtTime(amt, this.audioContext.currentTime, 0.05);
-        } else if (c.lfoActive) {
-          c.lfoGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.05);
-          setTimeout(() => {
-            if (c.lfoActive && states[i].depth === 0) this._deactivateLfo(i);
-          }, 100);
-        }
+        if (!c) return;
+        c.lfoGain.gain.setTargetAtTime(v * d, this.audioContext.currentTime, 0.05);
       }
 
       setPanLfoRate(i, r) {
         const c = this.channels[i];
-        if (!c || !c.active) return;
-        if (r > 0 && states[i].panDepth > 0) {
-          this._activatePanLfo(i);
-          c.panLfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
-        } else if (c.panLfoActive) {
-          c.panLfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
-        }
+        if (!c) return;
+        c.panLfo.frequency.setTargetAtTime(r, this.audioContext.currentTime, 0.05);
       }
 
       setPanLfoDepth(i, d) {
         const c = this.channels[i];
-        if (!c || !c.active) return;
-        if (d > 0) {
-          this._activatePanLfo(i);
-          c.panLfoGain.gain.setTargetAtTime(d, this.audioContext.currentTime, 0.05);
-        } else if (c.panLfoActive) {
-          c.panLfoGain.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.05);
-          setTimeout(() => {
-            if (c.panLfoActive && states[i].panDepth === 0) this._deactivatePanLfo(i);
-          }, 100);
-        }
+        if (!c) return;
+        c.panLfoGain.gain.setTargetAtTime(d, this.audioContext.currentTime, 0.05);
       }
 
       getFreq(i) { return this.rootFreq * (this.channels[i]?.ratio || 1); }
@@ -1091,7 +1045,7 @@
       const t = engine.audioContext ? engine.audioContext.currentTime : performance.now() / 1000;
       const hue = (t * 4) % 360;
       let brightness = 0.25;
-      if (engine.isRunning && engine.channels[0] && engine.channels[0].gain) {
+      if (engine.isRunning && engine.channels[0]) {
         const gainVal = engine.channels[0].gain.gain.value;
         brightness = 0.10 + Math.min(gainVal, 1) * 0.40;
       }
