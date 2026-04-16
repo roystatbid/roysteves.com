@@ -503,7 +503,7 @@
       </div>
     </div>
 
-    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.4</div>
+    <div style="text-align: center; font-size: 0.55rem; color: #4a4a66; margin-top: 16px;">v0.5</div>
   </div>
   <div id="moodOverlay"></div>
 
@@ -597,21 +597,30 @@
 
       start() {
         if (this.audioContext.state === 'suspended') this.audioContext.resume();
+        // Fade master in over 150ms
+        const t = this.audioContext.currentTime;
+        this.masterGain.gain.setValueAtTime(0, t);
+        this.masterGain.gain.linearRampToValueAtTime(1.0, t + 0.15);
         this.isRunning = true;
       }
 
       stop() {
         this.isRunning = false;
-        // Disconnect all channels from output, zero gains
-        this.channels.forEach(c => {
-          if (c.connected) {
-            c.panner.disconnect();
-            c.connected = false;
-          }
-          c.gain.gain.value = 0;
-          c.lfoGain.gain.value = 0;
-          c.panLfoGain.gain.value = 0;
-        });
+        // Fade master out over 150ms, then disconnect
+        const t = this.audioContext.currentTime;
+        this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, t);
+        this.masterGain.gain.linearRampToValueAtTime(0, t + 0.15);
+        setTimeout(() => {
+          this.channels.forEach(c => {
+            if (c.connected) {
+              c.panner.disconnect();
+              c.connected = false;
+            }
+            c.gain.gain.value = 0;
+            c.lfoGain.gain.value = 0;
+            c.panLfoGain.gain.value = 0;
+          });
+        }, 200);
       }
 
       setRootFreq(f) {
