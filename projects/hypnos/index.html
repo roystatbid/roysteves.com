@@ -541,7 +541,7 @@
       }
 
       init() {
-        this.audioContext = new AudioContext();
+        this.audioContext = new AudioContext({ latencyHint: 'playback' });
         this.masterGain = this.audioContext.createGain();
         this.masterGain.gain.value = 1.0;
         this.masterGain.connect(this.audioContext.destination);
