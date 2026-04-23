@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://roysteves.com/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Why Did You Choose Us? Asking in the Right Place</title>
+      <link>https://roysteves.com/blog/why-did-you-choose-us.html</link>
+      <guid>https://roysteves.com/blog/why-did-you-choose-us.html</guid>
+      <pubDate>Wed, 22 Apr 2026 00:00:00 GMT</pubDate>
+      <description>How Poolaroo embedded a one-tap "why did you choose us?" survey directly in the Shopify order confirmation email — no marketing opt-in required.</description>
+    </item>
+    <item>
       <title>ChatGPT Mistook our Shopify PDP as Out of Stock</title>
       <link>https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html</link>
       <guid>https://roysteves.com/blog/chatgpt-shopify-pdp-out-of-stock.html</guid>
