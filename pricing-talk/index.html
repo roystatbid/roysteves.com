@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Backstage at Poolaroo — Roy Steves</title>
+<link rel="stylesheet" href="deck-fonts-v8/fonts.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --azure:   #1E8FD5;   /* logo blue */
+  --deep:    #007AB8;   /* store button blue */
+  --yellow:  #FFB800;   /* the "a" */
+  --coral:   #FF4E4E;   /* savings/alert */
+  --green:   #1F7561;   /* success */
+  --ink:     #2A3743;   /* theme dark */
+  --dim:     #5E7285;
+  --faint:   #93A6B7;
+  --wash:    #F3FAFE;   /* page */
+  --pane:    #EAF4FB;   /* light aqua panel */
+  --line:    #CFE6F4;
+  --white:   #FFFFFF;
+  --head:    'Montserrat', system-ui, sans-serif;
+  --body:    'Bricolage Grotesque', system-ui, sans-serif;
+  --mono:    'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--wash);
+  color: var(--ink);
+  font-family: var(--body);
+  overflow: hidden;
+}
+
+.deck { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 8vh 8vw;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+
+/* floating decorative rings (the o's) */
+.ring { position: absolute; border-radius: 50%; border: 22px solid rgba(30,143,213,0.07); pointer-events: none; }
+.ring.r1 { width: 260px; height: 260px; top: -80px; right: -60px; }
+.ring.r2 { width: 150px; height: 150px; bottom: -50px; left: 10vw; border-color: rgba(255,184,0,0.09); border-width: 16px; }
+
+/* ══════ type ══════ */
+.tag {
+  display: inline-flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 1.1rem;
+}
+.tag .pill {
+  font-family: var(--head); font-weight: 700;
+  font-size: clamp(0.62rem, 0.9vw, 0.78rem);
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: #fff; background: var(--azure);
+  padding: 0.45em 1.2em; border-radius: 2em;
+  box-shadow: 0 3px 10px rgba(30,143,213,0.25);
+}
+.tag .after { font-family: var(--head); font-weight: 600; font-size: clamp(0.62rem,0.9vw,0.78rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+.headline {
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: clamp(2.2rem, 4.6vw, 3.9rem);
+  line-height: 1.08;
+  color: var(--ink);
+  margin-bottom: 1.1rem;
+  max-width: 24ch;
+  letter-spacing: -0.015em;
+}
+.headline em { font-style: normal; color: var(--azure); }
+.headline .coral { color: var(--coral); }
+.headline .sun { color: var(--yellow); }
+
+.lede {
+  font-size: clamp(1rem, 1.5vw, 1.28rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 58ch;
+}
+.lede strong { color: var(--ink); font-weight: 600; }
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.splash {
+  margin-top: 1.6rem;
+  display: inline-flex; align-items: center; gap: 0.9rem;
+  background: var(--white);
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  padding: 0.9rem 1.4rem;
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  font-weight: 400;
+  color: var(--ink);
+  box-shadow: 0 6px 20px rgba(30,143,213,0.10);
+  max-width: 62ch;
+  line-height: 1.4;
+}
+.splash::before { content: ''; flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: 5px solid var(--yellow); }
+.splash strong { color: var(--deep); }
+
+.datasource {
+  margin-top: auto; padding-top: 0.9rem;
+  font-family: var(--mono);
+  font-size: clamp(0.55rem, 0.72vw, 0.65rem);
+  color: var(--faint); letter-spacing: 0.05em;
+}
+
+.card {
+  background: var(--white);
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 6px 22px rgba(30,143,213,0.09);
+}
+
+.diagram { width: 100%; overflow: visible; }
+svg text { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+svg .mono { font-family: 'IBM Plex Mono', Menlo, monospace; }
+svg .hd { font-family: 'Montserrat', system-ui, sans-serif; }
+
+/* ══════ S1 COLD OPEN ══════ */
+#s1 { align-items: center; text-align: center; justify-content: center; }
+#s1 .logo { height: clamp(44px, 7vh, 64px); width: auto; margin-bottom: 2.2rem; }
+#s1 .sku-line { font-family: var(--head); font-weight: 600; font-size: clamp(0.72rem,1vw,0.88rem); letter-spacing: 0.22em; color: var(--faint); margin-bottom: 1.6rem; text-transform: uppercase; }
+#s1 .big-price {
+  font-family: var(--head); font-weight: 800;
+  font-size: clamp(4rem, 12vw, 10.5rem);
+  line-height: 1; color: var(--azure);
+  letter-spacing: -0.02em;
+  -webkit-text-stroke: 7px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 14px 34px rgba(42,55,67,0.18);
+}
+#s1 .big-price .sun { color: var(--yellow); -webkit-text-stroke: 7px #fff; }
+#s1 .what { font-size: clamp(1.05rem,1.8vw,1.45rem); font-weight: 300; color: var(--dim); margin-top: 2.6rem; max-width: 50ch; line-height: 1.55; }
+#s1 .what strong { color: var(--ink); font-weight: 600; }
+#s1 .event-foot { position: absolute; bottom: calc(6.5vh + 1.1rem); left: 0; right: 0; text-align: center; font-family: var(--head); font-weight: 600; font-size: clamp(0.62rem,0.85vw,0.75rem); letter-spacing: 0.2em; color: var(--faint); text-transform: uppercase; z-index: 95; }
+/* ══════ persistent water frame — seamless tile, any viewport ══════ */
+.water, .water-alert {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: 6.5vh; min-height: 44px;
+  pointer-events: none; z-index: 90;
+  transition: opacity 0.6s ease;
+}
+.water .layer, .water-alert .layer {
+  position: absolute; inset: 0;
+  background-repeat: repeat-x;
+  background-size: 240px 100%;
+}
+.water .l1 { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80' preserveAspectRatio='none'%3E%3Cpath d='M0,38 Q60,18 120,38 T240,38 L240,80 L0,80 Z' fill='%231E8FD5' fill-opacity='0.10'/%3E%3C/svg%3E"); animation: driftL 40s linear infinite; }
+.water .l2 { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80' preserveAspectRatio='none'%3E%3Cpath d='M0,52 Q60,32 120,52 T240,52 L240,80 L0,80 Z' fill='%231E8FD5' fill-opacity='0.16'/%3E%3C/svg%3E"); animation: driftR 65s linear infinite; }
+.water-alert { opacity: 0; }
+.water-alert .a1 { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80' preserveAspectRatio='none'%3E%3Cpath d='M0,38 Q60,18 120,38 T240,38 L240,80 L0,80 Z' fill='%23FF4E4E' fill-opacity='0.13'/%3E%3C/svg%3E"); animation: driftL 26s linear infinite; }
+.water-alert .a2 { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80' preserveAspectRatio='none'%3E%3Cpath d='M0,52 Q60,32 120,52 T240,52 L240,80 L0,80 Z' fill='%23FF4E4E' fill-opacity='0.20'/%3E%3C/svg%3E"); animation: driftR 44s linear infinite; }
+body.alert .water { opacity: 0; }
+body.alert .water-alert { opacity: 1; }
+body.alert .hud .h-head { background: var(--coral); }
+@keyframes driftL { from { background-position-x: 0; } to { background-position-x: -240px; } }
+@keyframes driftR { from { background-position-x: 0; } to { background-position-x: 240px; } }
+
+/* ══════ tripwire condition pill (ported from v7) ══════ */
+.condition { display: inline-flex; margin-top: 0.2rem; margin-bottom: 0.6rem; }
+.condition .cp {
+  background: var(--coral); color: #fff;
+  font-family: var(--head); font-weight: 800;
+  letter-spacing: 0.18em; font-size: clamp(0.68rem, 0.95vw, 0.84rem);
+  padding: 0.5em 1.4em; border-radius: 2em;
+  box-shadow: 0 4px 14px rgba(255,78,78,0.4);
+  animation: blink 1.6s step-end infinite;
+}
+@keyframes blink { 0%, 70% { opacity: 1; } 71%, 100% { opacity: 0.45; } }
+
+/* ══════ hero photo ══════ */
+#s1 .hero-shot { display: flex; align-items: center; justify-content: center; gap: clamp(2rem, 6vw, 5rem); flex-wrap: wrap; }
+#s1 .hero-prod { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+#s1 .photo-card { background: #fff; border-radius: 20px; padding: 12px 12px 14px; box-shadow: 0 16px 40px rgba(42,55,67,0.18); }
+#s1 .hero-prod:nth-child(1) .photo-card { transform: rotate(-3deg); }
+#s1 .hero-prod:nth-child(2) .photo-card { transform: rotate(3deg); }
+#s1 .photo-card img { height: clamp(150px, 24vh, 240px); width: auto; max-width: clamp(160px, 20vw, 280px); display: block; border-radius: 12px; }
+#s1 .hp-sku { font-family: var(--head); font-weight: 600; font-size: clamp(0.62rem, 0.9vw, 0.78rem); letter-spacing: 0.2em; color: var(--faint); text-transform: uppercase; }
+#s1 .hp-price { font-family: var(--head); font-weight: 800; font-size: clamp(1.9rem, 4.2vw, 3.4rem); line-height: 1; color: var(--azure); letter-spacing: -0.02em; -webkit-text-stroke: 5px #fff; paint-order: stroke fill; text-shadow: 0 8px 20px rgba(42,55,67,0.15); }
+#s1 .hp-price .sun { color: var(--yellow); -webkit-text-stroke: 5px #fff; }
+.prod-cap { display: flex; align-items: center; gap: 0.8rem; margin-top: 1.3rem; }
+.prod-cap img { width: 92px; height: 92px; border-radius: 14px; border: 2px solid var(--line); background: #fff; object-fit: cover; }
+.prod-cap .t { font-size: clamp(0.9rem, 1.3vw, 1.1rem); color: var(--dim); font-weight: 300; }
+.prod-cap .t strong { color: var(--ink); font-weight: 600; }
+.hud .h-col { display: flex; flex-direction: column; }
+.hud .h-thumb { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; border: 2px solid var(--line); background: #fff; flex-shrink: 0; }
+
+/* ══════ S2 WINDOW ══════ */
+.win-tabs { display: flex; gap: 12px; margin-top: 2rem; max-width: 940px; }
+.win-tab { flex: 1; background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 0.9rem 1rem 1rem; box-shadow: 0 5px 16px rgba(30,143,213,0.08); }
+.win-tab .s { display: block; font-family: var(--head); font-weight: 700; font-size: clamp(0.68rem,0.95vw,0.82rem); letter-spacing: 0.08em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.35rem; white-space: nowrap; }
+.win-tab .p { display: block; font-family: var(--mono); font-size: clamp(1.15rem,2vw,1.75rem); font-weight: 600; color: var(--ink); }
+.win-tab.us { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 8px 22px rgba(255,184,0,0.35); transform: translateY(-6px); }
+.win-tab.us .s { color: rgba(42,55,67,0.75); }
+.win-tab.us .p { color: var(--ink); }
+
+/* revamped S2/S3 — naive bell + sawtooth, product photo upper-right */
+.chartslide .photo-card { position: absolute; top: 6vh; right: 7vw; z-index: 6; background: #fff; border-radius: 18px; padding: 11px 11px 12px; box-shadow: 0 14px 36px rgba(42,55,67,0.17); transform: rotate(-3deg); }
+.chartslide .photo-card img { width: clamp(150px, 14vw, 210px); height: auto; display: block; margin: 0 auto; border-radius: 11px; }
+.chartslide .photo-card .pc-cap { text-align: center; margin-top: 0.65rem; font-size: clamp(0.7rem, 0.95vw, 0.82rem); color: var(--dim); font-weight: 600; }
+.chartslide .photo-card .pc-cap .num { color: var(--deep); }
+.chartslide .bell { display: block; width: 100%; max-width: 1200px; max-height: 60vh; margin: 1.4rem auto 0; overflow: visible; }
+
+/* ══════ S3 CRED ══════ */
+.cred-row { display: flex; gap: 4vw; align-items: center; margin-top: 1.4rem; }
+.cred-list { display: flex; flex-direction: column; gap: 1.2rem; flex: 1; }
+.cred { display: flex; gap: 1.2rem; align-items: baseline; }
+.cred .yr { font-family: var(--head); font-weight: 700; font-size: clamp(0.85rem,1.2vw,1.05rem); color: var(--azure); flex-shrink: 0; width: 6ch; }
+.cred .tx { font-size: clamp(0.98rem,1.45vw,1.25rem); color: var(--ink); font-weight: 400; line-height: 1.5; }
+.cred .tx span { color: var(--dim); font-weight: 300; }
+.cred-photo { flex-shrink: 0; text-align: center; }
+.cred-photo img.hs { width: clamp(130px,15vw,190px); height: clamp(130px,15vw,190px); border-radius: 50%; object-fit: cover; border: 6px solid #fff; box-shadow: 0 10px 30px rgba(30,143,213,0.25), 0 0 0 3px var(--line); }
+.cred-photo .lg { margin-top: 1.3rem; }
+.cred-photo .lg img { height: 30px; width: auto; }
+
+/* ══════ S4 / S12 STOPS ══════ */
+.stops { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-top: 2.2rem; }
+.stop { background: var(--white); border: 2px solid var(--line); border-radius: 18px; padding: 1rem 1.1rem 1.1rem; box-shadow: 0 5px 16px rgba(30,143,213,0.08); position: relative; }
+.stop .n { display: inline-block; font-family: var(--head); font-weight: 800; font-size: clamp(0.78rem,1.1vw,0.95rem); color: #fff; background: var(--azure); width: 2em; height: 2em; line-height: 2em; text-align: center; border-radius: 50%; margin-bottom: 0.55rem; }
+.stop .t { display: block; font-size: clamp(0.9rem,1.3vw,1.1rem); color: var(--ink); line-height: 1.35; font-weight: 400; }
+.stop.dead { background: var(--pane); border-style: dashed; box-shadow: none; }
+.stop.dead .n { background: var(--faint); }
+.stop.dead .t { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--coral); text-decoration-thickness: 2.5px; }
+.stop.lit { border-color: var(--azure); }
+.stop.lit .n { background: var(--yellow); color: var(--ink); }
+
+/* Vertical "big questions" card list — bubble left, header/subtitle right. Used by the Four Questions slide (#s4) and the competitor breakout (#s5b); S12 keeps its 5-across grid. */
+.stops.qlist { display: flex; flex-direction: column; gap: 18px; margin-top: calc(1.8rem + 30px); max-width: 840px; }
+.qlist .stop { display: flex; align-items: center; gap: 1.5rem; padding: 1.3rem 1.9rem; }
+.qlist .stop .n { margin-bottom: 0; flex-shrink: 0; font-size: clamp(1.4rem, 2.2vw, 2rem); }
+.qlist .stop .qtext { display: flex; flex-direction: column; gap: 0.2rem; }
+.qlist .stop .qh { font-family: var(--head); font-weight: 800; font-size: clamp(1.4rem, 2.4vw, 2.05rem); color: var(--ink); line-height: 1.12; letter-spacing: -0.01em; }
+.qlist .stop .qs { font-size: clamp(0.95rem, 1.5vw, 1.25rem); color: var(--dim); font-weight: 300; line-height: 1.3; }
+
+/* S4 dual product tracker — both hero products present */
+#s4 .dualhud { position: absolute; top: 3vh; right: 3vw; z-index: 40; display: flex; flex-direction: column; gap: 14px; }
+#s4 .trackcard { background: var(--white); border: 2px solid var(--line); border-radius: 16px; box-shadow: 0 8px 26px rgba(30,143,213,0.18); overflow: hidden; min-width: 216px; }
+#s4 .trackcard .th { font-family: var(--head); color: #fff; font-weight: 700; font-size: 0.6rem; letter-spacing: 0.14em; padding: 0.45em 1em; }
+#s4 .trackcard.motor .th { background: var(--azure); }
+#s4 .trackcard.bottle .th { background: var(--deep); }
+#s4 .trackcard .tbody { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem 0.7rem; }
+#s4 .trackcard .timg { width: 84px; height: 84px; object-fit: contain; border-radius: 12px; border: 2px solid var(--line); background: #fff; flex-shrink: 0; }
+#s4 .trackcard .tcol { display: flex; flex-direction: column; }
+#s4 .trackcard .tp { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; color: var(--ink); margin-bottom: 0.4rem; }
+#s4 .trackcard .tbadges { display: flex; gap: 0.3rem; }
+#s4 .trackcard .tb-pill { font-family: var(--head); font-size: 0.5rem; letter-spacing: 0.05em; color: var(--faint); border: 1.5px solid var(--line); border-radius: 2em; padding: 0.32em 0.55em; font-weight: 700; }
+
+/* competitor logo breakout row (S5b) — swap each .ph placeholder for a logo <img> */
+.complogos { display: flex; gap: 16px; margin-top: 2.2rem; max-width: 1160px; }
+.compcol { flex: 1; display: flex; flex-direction: column; gap: 0.7rem; }
+.complogo { background: var(--white); border: 2px solid var(--line); border-radius: 16px; box-shadow: 0 5px 16px rgba(30,143,213,0.08); padding: 1.1rem 1rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.55rem; }
+.complogo .logo-slot { width: 100%; height: 66px; display: flex; align-items: center; justify-content: center; }
+.complogo .logo-slot img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.complogo .logo-slot .ph { font-family: var(--head); font-weight: 800; font-size: clamp(0.95rem, 1.45vw, 1.2rem); color: var(--deep); text-align: center; letter-spacing: -0.01em; }
+.complogo .cp-price { font-family: var(--mono); font-weight: 600; font-size: clamp(1rem, 1.5vw, 1.3rem); color: var(--ink); }
+/* competitor identifier below each box — how we matched it (UPC / MPN / ASIN) */
+.compid { text-align: center; }
+.compid .k { display: block; font-family: var(--head); font-weight: 800; font-size: clamp(0.68rem, 0.9vw, 0.82rem); letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.14rem; }
+.compid .v { display: block; font-family: var(--mono); font-weight: 600; font-size: clamp(0.72rem, 1vw, 0.9rem); color: var(--dim); letter-spacing: -0.01em; }
+/* scrape-method box below each competitor (S5c "how") — color-coded by flavor */
+.comphow { border-radius: 12px; padding: 0.5rem 0.5rem 0.55rem; text-align: center; font-family: var(--head); font-weight: 700; font-size: clamp(0.75rem, 1vw, 0.94rem); line-height: 1.12; }
+.comphow .hs { display: block; font-family: var(--mono); font-weight: 600; font-size: clamp(0.56rem, 0.72vw, 0.66rem); letter-spacing: 0.01em; margin-top: 0.2rem; opacity: 0.8; }
+.how-keepa   { background: rgba(255,78,78,0.12); color: #E03A3A; border: 2px solid rgba(255,78,78,0.32); }
+.how-custom  { background: var(--pane); color: var(--deep); border: 2px solid var(--line); }
+.how-generic { background: rgba(31,117,97,0.12); color: var(--green); border: 2px solid rgba(31,117,97,0.30); }
+
+/* ══════ MATCH slide (#smatch) — bottle answer-key vs how each rival identifies it ══════ */
+#smatch .matchwrap { display: flex; align-items: center; width: calc(100% + 8vw); margin-top: 1rem; }
+#smatch .matchleft { flex: 0 0 600px; max-width: 600px; min-width: 0; display: flex; flex-direction: column; gap: 5px; transform: scale(1.1); transform-origin: top left; }
+#smatch .matchhead { display: grid; grid-template-columns: 6.5ch minmax(5ch, 1fr) 4.6rem 12.5ch 5.6rem; gap: 0.7rem; padding: 0 0.85rem 0.15rem; }
+#smatch .matchhead span { font-family: var(--head); font-weight: 700; font-size: clamp(0.5rem, 0.68vw, 0.6rem); letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: center; }
+#smatch .matchrow { display: grid; grid-template-columns: 6.5ch minmax(5ch, 1fr) 4.6rem 12.5ch 5.6rem; align-items: center; gap: 0.7rem; background: var(--white); border: 1.5px solid var(--line); border-radius: 10px; padding: 0.32rem 0.85rem; box-shadow: 0 2px 8px rgba(30,143,213,0.05); }
+#smatch .mprice { font-family: var(--mono); font-weight: 600; font-size: clamp(0.72rem, 0.95vw, 0.86rem); color: var(--dim); text-align: right; }
+#smatch .cname { font-family: var(--head); font-weight: 600; font-size: clamp(0.8rem, 1.05vw, 0.96rem); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#smatch .mtype { justify-self: start; font-family: var(--head); font-weight: 800; font-size: clamp(0.56rem, 0.76vw, 0.68rem); letter-spacing: 0.06em; text-transform: uppercase; padding: 0.24em 0.7em; border-radius: 2em; white-space: nowrap; }
+#smatch .mval { font-family: var(--mono); font-weight: 600; font-size: clamp(0.72rem, 0.96vw, 0.88rem); color: var(--dim); white-space: nowrap; text-align: left; }
+#smatch .mval.only { font-family: var(--body); font-style: italic; font-weight: 400; color: var(--faint); }
+#smatch .stars { justify-self: end; white-space: nowrap; font-size: clamp(0.74rem, 0.98vw, 0.92rem); letter-spacing: 0.03em; }
+#smatch .stars .on { color: #E8A400; }
+#smatch .stars .off { color: #C9D6E0; }
+.mt-upc   { background: rgba(31,117,97,0.14);  color: #1F7561; }
+.mt-mpn   { background: rgba(30,143,213,0.16); color: #1E8FD5; }
+.mt-asin  { background: rgba(0,122,184,0.16);  color: #007AB8; }
+.mt-title { background: rgba(255,78,78,0.13);  color: #E03A3A; }
+#smatch .matchright { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; }
+#smatch .ourcard { width: 320px; max-width: 100%; background: var(--white); border: 2px solid var(--yellow); border-radius: 18px; box-shadow: 0 8px 24px rgba(255,184,0,0.20); padding: 1rem 1.3rem 1.2rem; display: flex; flex-direction: column; align-items: center; }
+#smatch .ourhead { font-family: var(--head); font-weight: 800; font-size: clamp(0.6rem, 0.82vw, 0.72rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--deep); margin-bottom: 0.5rem; }
+#smatch .ourcard img { width: clamp(115px, 11vw, 165px); height: auto; display: block; }
+#smatch .ourtitle { font-family: var(--body); font-weight: 500; font-size: clamp(0.8rem, 1.02vw, 0.96rem); color: var(--ink); text-align: center; line-height: 1.3; margin: 0.7rem 0 0.9rem; max-width: 26ch; }
+#smatch .ourid { width: 100%; display: flex; flex-direction: column; }
+#smatch .oid { display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem; border-top: 1.5px solid var(--line); padding: 0.5rem 0; }
+#smatch .oid .k { font-family: var(--head); font-weight: 700; font-size: clamp(0.58rem, 0.8vw, 0.7rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
+#smatch .oid .v { font-family: var(--mono); font-weight: 600; font-size: clamp(0.78rem, 1.02vw, 0.94rem); color: var(--ink); }
+
+/* ══════ COSTS slide (#scost) — two products' cost inputs side by side ══════ */
+#scost .costwrap { display: flex; gap: clamp(1.5rem, 4vw, 3.5rem); justify-content: center; align-items: stretch; width: 100%; margin-top: 1rem; }
+#scost .costcard { flex: 0 1 420px; max-width: 420px; background: var(--white); border: 2px solid var(--line); border-radius: 18px; box-shadow: 0 6px 22px rgba(30,143,213,0.09); padding: 0.9rem 1.4rem 0.9rem; display: flex; flex-direction: column; }
+#scost .cchead { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.55rem; }
+#scost .cchead img { width: 54px; height: 54px; object-fit: contain; border-radius: 12px; border: 2px solid var(--line); flex-shrink: 0; }
+#scost .cchead .nm { font-family: var(--head); font-weight: 800; font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--ink); line-height: 1.15; }
+#scost .cchead .sk { font-family: var(--mono); font-size: clamp(0.66rem, 0.88vw, 0.8rem); color: var(--faint); margin-top: 0.2rem; }
+#scost .crow { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.3rem 0; font-size: clamp(0.92rem, 1.3vw, 1.1rem); }
+#scost .crow .lb { color: var(--dim); font-weight: 400; }
+#scost .crow .lb small { display: block; font-size: 0.68em; color: var(--faint); margin-top: 0.05rem; }
+#scost .crow .vl { font-family: var(--mono); font-weight: 600; color: var(--ink); white-space: nowrap; }
+#scost .crow.ship .vl.pos { color: #C98F00; }
+#scost .crow.ship .vl.neg { color: var(--deep); }
+#scost .crow.landed { border-top: 2px solid var(--line); margin-top: 0.35rem; padding-top: 0.65rem; }
+#scost .crow.landed .lb { color: var(--ink); font-weight: 700; font-family: var(--head); }
+#scost .crow.landed .vl { font-size: 1.12em; color: var(--ink); }
+#scost .ccurve { margin-top: auto; padding-top: 0.6rem; }
+#scost .ccurve .box { background: var(--pane); border-radius: 12px; padding: 0.7rem 1.1rem; display: flex; justify-content: space-between; align-items: center; }
+#scost .ccurve .cl { font-family: var(--head); font-weight: 700; font-size: clamp(0.66rem, 0.88vw, 0.78rem); color: var(--deep); text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; }
+#scost .ccurve .cm { font-family: var(--head); font-weight: 800; font-size: clamp(1.4rem, 2.1vw, 1.8rem); color: var(--azure); }
+#scost .costfoot { align-self: center; text-align: center; margin-top: 1.5rem; max-width: 66ch; font-size: clamp(0.9rem, 1.3vw, 1.1rem); color: var(--dim); font-weight: 300; line-height: 1.5; }
+#scost .costfoot strong { color: var(--deep); font-weight: 600; }
+#scost .crow .lb .net { color: var(--azure); font-weight: 700; }
+#scost .crow .lb small .hl { color: #C98F00; font-weight: 700; font-style: normal; }
+#scost .costcurve { width: 100%; max-width: 1375px; align-self: center; margin-top: 0.3rem; }
+#scost .costcurve svg { width: 100%; height: auto; max-height: 32vh; display: block; overflow: visible; }
+/* S13 (#s10) — Chase/Hold stacked, motor sawtooth to the right */
+#s10 .holdwrap { display: flex; gap: clamp(1.4rem, 3.5vw, 3rem); align-items: center; width: 100%; margin-top: 1.3rem; }
+#s10 .holdcol { flex: 0 1 460px; max-width: 460px; display: flex; flex-direction: column; gap: 1rem; }
+#s10 .holdchart { flex: 1; min-width: 0; }
+#s10 .holdchart svg { width: 100%; height: auto; max-height: 46vh; display: block; overflow: visible; }
+/* S12+13 consolidated (#s9) — two sawtooths side by side, product card under each */
+/* charts break out of the slide's 8vw side padding to sit ~20px from each viewport edge and ~20px apart */
+#s9 .duowrap { display: flex; gap: 20px; justify-content: center; align-items: flex-start; width: calc(100vw - 40px); margin-left: calc(20px - 8vw); margin-top: 0.8rem; }
+#s9 .duocol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+#s9 .duocol svg { width: 100%; height: auto; max-height: 60vh; display: block; overflow: visible; }
+#s9 .duocard { display: flex; align-items: center; gap: 1rem; margin-top: 0.9rem; background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 0.7rem 1.5rem; box-shadow: 0 6px 18px rgba(30,143,213,0.10); }
+#s9 .duocard img { width: 84px; height: 84px; object-fit: contain; flex-shrink: 0; }
+#s9 .duocard .nm { font-family: var(--head); font-weight: 700; font-size: clamp(1.05rem, 1.6vw, 1.4rem); color: var(--ink); line-height: 1.1; }
+#s9 .duocard .sk { font-family: var(--mono); font-size: clamp(0.74rem, 1vw, 0.9rem); color: var(--faint); }
+#s9 .duocard .pr { font-family: var(--mono); font-weight: 600; font-size: clamp(1.15rem, 1.7vw, 1.5rem); color: var(--ink); margin-left: auto; padding-left: 0.8rem; }
+/* tripwire node in the S14 flowchart blinks like the old condition pill */
+.tripwire-node { animation: blink 1.6s step-end infinite; }
+
+/* ══════ S5 HURDLES ══════ */
+.hurdles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 1.6rem; max-width: 1000px; }
+.hurd { background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 0.95rem 1.3rem; box-shadow: 0 5px 16px rgba(30,143,213,0.08); }
+.hurd .h { font-family: var(--head); font-weight: 700; font-size: clamp(0.95rem,1.35vw,1.15rem); color: var(--deep); margin-bottom: 0.25rem; }
+.hurd .d { font-size: clamp(0.85rem,1.2vw,1.02rem); color: var(--dim); line-height: 1.5; font-weight: 300; }
+.hurd .d code { font-family: var(--mono); font-size: 0.85em; background: var(--pane); color: var(--deep); padding: 0.1em 0.45em; border-radius: 6px; }
+
+/* ══════ S6 ERA + MOVES ══════ */
+.era-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 3.5vw; margin-top: 1.4rem; align-items: start; }
+.era { display: flex; gap: 1.1rem; margin-bottom: 1.3rem; }
+.era .cap { flex: 0 0 10px; background: var(--azure); border-radius: 5px; }
+.era .yr { font-family: var(--head); font-weight: 800; font-size: clamp(1.05rem,1.6vw,1.4rem); color: var(--ink); margin-bottom: 0.2rem; }
+.era .tx { font-size: clamp(0.9rem,1.32vw,1.12rem); color: var(--ink); font-weight: 400; line-height: 1.5; }
+.era .tx span { color: var(--dim); font-weight: 300; }
+.mag-bars { margin-top: 1.3rem; }
+.mag-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.7rem; }
+.mag-row .lab { font-family: var(--head); font-weight: 600; font-size: clamp(0.68rem,0.95vw,0.82rem); color: var(--dim); width: 9ch; flex-shrink: 0; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.04em; }
+.mag-row .bar { height: 18px; border-radius: 9px; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08); }
+.mag-row .val { font-family: var(--mono); font-size: clamp(0.92rem,1.3vw,1.15rem); font-weight: 600; }
+.move-card { border-radius: 18px; overflow: hidden; margin-bottom: 1rem; background: var(--white); border: 2px solid var(--line); box-shadow: 0 5px 16px rgba(30,143,213,0.08); }
+.move-card .lb { display: block; font-family: var(--head); color: #fff; font-weight: 700; font-size: clamp(0.62rem,0.88vw,0.76rem); letter-spacing: 0.16em; padding: 0.45em 1.2em; }
+.move-card.no .lb { background: var(--coral); }
+.move-card.yes .lb { background: var(--green); }
+.move-card .inner { padding: 0.75rem 1.2rem 0.95rem; }
+.move-card .hd { font-family: var(--head); font-weight: 700; font-size: clamp(1.05rem,1.7vw,1.45rem); color: var(--ink); margin-bottom: 0.25rem; }
+.move-card.no .hd { color: var(--dim); }
+.move-card .bd { font-size: clamp(0.82rem,1.15vw,0.98rem); color: var(--dim); line-height: 1.5; font-weight: 300; }
+
+/* ══════ S7 CASCADE ══════ */
+.cascade { display: flex; align-items: stretch; gap: 8px; margin-top: 1.5rem; max-width: 1160px; }
+.casc-step { flex: 1; background: var(--white); border: 2px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 5px 16px rgba(30,143,213,0.08); }
+.casc-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--head); font-weight: 800; font-size: clamp(1.5rem, 2.6vw, 2.4rem); color: var(--azure); opacity: 0.5; padding: 0 0.15rem; }
+.casc-step .cn { display: block; text-align: center; font-family: var(--head); background: var(--pane); font-weight: 700; font-size: clamp(1.05rem,1.5vw,1.35rem); letter-spacing: 0.06em; padding: 0.4em 1em; line-height: 1.1; }
+.casc-step .cn.gold { background: var(--yellow); }
+.casc-step .cn .on { color: #E8A400; }
+.casc-step .cn .off { color: #C9D6E0; }
+.casc-step .inner { padding: 0.7rem 1.1rem 0.9rem; }
+.casc-step .ch { font-family: var(--head); font-weight: 700; font-size: clamp(0.98rem,1.42vw,1.22rem); color: var(--ink); margin-bottom: 0.2rem; }
+.casc-step .cd { font-size: clamp(0.8rem,1.12vw,0.95rem); color: var(--dim); line-height: 1.45; font-weight: 300; }
+
+.chip-row { margin-top: 13px; display: flex; align-items: center; gap: 1.1rem; background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 0.8rem 1.3rem; max-width: 1100px; box-shadow: 0 5px 16px rgba(30,143,213,0.08); }
+.chip-row .lbl { flex-shrink: 0; font-family: var(--head); color: #fff; font-weight: 700; font-size: clamp(0.6rem,0.85vw,0.72rem); letter-spacing: 0.14em; padding: 0.5em 1.2em; border-radius: 2em; white-space: nowrap; }
+.chip-row .txt { font-size: clamp(0.88rem,1.25vw,1.05rem); color: var(--ink); line-height: 1.5; font-weight: 300; }
+.chip-row.skip { border-color: rgba(255,78,78,0.4); }
+.chip-row.skip .lbl { background: var(--coral); }
+.chip-row.skip .txt strong { color: var(--coral); font-weight: 600; }
+.chip-row.real .lbl { background: var(--deep); }
+.chip-row.real .txt .num { color: var(--coral); font-weight: 600; }
+.chip-row.story { border-color: rgba(255,184,0,0.5); }
+.chip-row.story .lbl { background: var(--yellow); color: var(--ink); }
+.chip-row.story .txt em { font-style: normal; color: var(--deep); font-weight: 600; }
+.chip-row.story .txt .fire { color: var(--coral); font-weight: 600; }
+.chip-row.chop { border-color: rgba(31,117,97,0.35); }
+.chip-row.chop .lbl { background: var(--green); }
+.chip-row.chop .txt .num { font-weight: 600; }
+.chip-row.chop .txt .us { color: #0E9A60; font-weight: 600; }
+.chip-row img.spin { width: 184px; height: 184px; border-radius: 14px; border: 2px solid var(--line); background: #fff; object-fit: cover; flex-shrink: 0; }
+
+/* ══════ S10 OUTCOMES ══════ */
+.outcomes { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; margin-top: 1.6rem; max-width: 1020px; }
+.oc { border-radius: 20px; overflow: hidden; background: var(--white); border: 2px solid var(--line); box-shadow: 0 6px 20px rgba(30,143,213,0.09); }
+.oc .ol { display: block; font-family: var(--head); color: #fff; font-weight: 700; font-size: clamp(0.66rem,0.92vw,0.8rem); letter-spacing: 0.16em; padding: 0.45em 1.2em; }
+.oc.chase .ol { background: var(--coral); }
+.oc.hold .ol { background: var(--yellow); color: var(--ink); }
+.oc.hold { border-color: rgba(255,184,0,0.55); }
+.oc .inner { padding: 0.85rem 1.4rem 1.15rem; }
+.oc .oh { font-family: var(--head); font-weight: 800; font-size: clamp(1.25rem,2.1vw,1.8rem); color: var(--ink); margin-bottom: 0.35rem; }
+.oc.chase .oh { color: var(--dim); }
+.oc .ob { font-size: clamp(0.88rem,1.25vw,1.05rem); color: var(--dim); line-height: 1.55; font-weight: 300; }
+.oc .ob strong { color: var(--ink); font-weight: 600; }
+
+/* ══════ S13 RUNGS ══════ */
+/* four equal-size rungs climbing lower-left → upper-right; arrow at the right-side
+   midpoint of each of the first three boxes (movement + lift) */
+.rungs { display: flex; align-items: flex-start; justify-content: center; gap: clamp(2.4rem,4.2vw,4rem); margin-top: 1.2rem; }
+.rung-step { position: relative; flex: 1 1 0; min-width: 0; }
+.rung-step.s1 { margin-top: 195px; }
+.rung-step.s2 { margin-top: 130px; }
+.rung-step.s3 { margin-top: 65px; }
+.rung-step.s4 { margin-top: 0; }
+.rg { height: 12rem; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--white); border: 2px solid var(--line); box-shadow: 0 6px 20px rgba(30,143,213,0.09); }
+.rg.four { border-color: rgba(255,184,0,0.55); }
+.rg .rn { display: block; text-align: center; font-family: var(--head); background: var(--pane); color: var(--deep); font-weight: 800; font-size: clamp(0.6rem,0.85vw,0.74rem); letter-spacing: 0.18em; padding: 0.5em 1.2em; }
+.rg.two .rn { background: var(--azure); color: #fff; }
+.rg.three .rn { background: var(--green); color: #fff; }
+.rg.four .rn { background: var(--yellow); color: var(--ink); }
+.rg .inner { padding: 0.8rem 1.15rem 1.1rem; }
+.rg .rh { font-family: var(--head); font-weight: 800; font-size: clamp(0.98rem,1.45vw,1.28rem); color: var(--ink); line-height: 1.15; margin-bottom: 0.35rem; }
+.rg .rb { font-size: clamp(0.78rem,1.02vw,0.92rem); color: var(--dim); line-height: 1.5; font-weight: 300; }
+.rg .rb em { font-style: normal; color: var(--deep); font-weight: 600; }
+.rung-arrow { position: absolute; left: 100%; top: 50%; transform: translateY(calc(-50% - 15px)); margin-left: clamp(0.3rem,0.9vw,0.85rem); display: flex; align-items: center; }
+.rung-arrow svg { width: clamp(28px,3vw,44px); height: auto; }
+
+/* ══════ S14 CLOSE ══════ */
+#s14 { align-items: center; text-align: center; justify-content: center; }
+#s14 { justify-content: center; align-items: center; }
+#s14 .closewrap { display: flex; align-items: center; gap: clamp(2rem, 5vw, 5rem); width: 100%; max-width: 1520px; }
+#s14 .closeleft { flex: 1 1 57%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1.3rem; }
+#s14 .closeleft .headline { max-width: 15ch; margin-bottom: 0; text-align: left; font-size: clamp(1.8rem, 3.4vw, 3rem); }
+#s14 .adminshot { max-width: 100%; max-height: 56vh; width: auto; height: auto; border-radius: 16px; border: 2px solid var(--line); box-shadow: 0 14px 44px rgba(30,143,213,0.20); }
+#s14 .closeright { flex: 1 1 43%; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.85rem; }
+#s14 .logo { height: clamp(48px, 8vh, 82px); width: auto; margin-bottom: 0.3rem; }
+#s14 .ctitle { font-family: var(--head); font-weight: 800; font-size: clamp(1.3rem, 2.15vw, 1.95rem); color: var(--ink); line-height: 1.15; max-width: 20ch; letter-spacing: -0.01em; }
+#s14 .csub { font-family: var(--head); font-weight: 600; font-size: clamp(1rem, 1.55vw, 1.35rem); color: var(--azure); letter-spacing: 0.01em; }
+#s14 .cperson { display: flex; flex-direction: column; align-items: center; gap: 0.45rem; margin-top: 1.1rem; }
+#s14 .portrait { width: clamp(96px, 11vw, 148px); height: clamp(96px, 11vw, 148px); border-radius: 50%; object-fit: cover; border: 3px solid var(--yellow); box-shadow: 0 8px 24px rgba(255,184,0,0.28); }
+#s14 .cname { font-family: var(--head); font-weight: 700; font-size: clamp(1.05rem, 1.5vw, 1.3rem); color: var(--ink); }
+#s14 .cemail { font-family: var(--mono); font-size: clamp(0.85rem, 1.15vw, 1.05rem); color: var(--deep); }
+#s14 .cslides { margin-top: 1.1rem; display: flex; flex-direction: column; align-items: center; gap: 0.45rem; }
+#s14 .cslabel { font-family: var(--head); font-weight: 700; font-size: clamp(0.62rem, 0.9vw, 0.75rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+#s14 .curl { font-family: var(--mono); font-weight: 600; font-size: clamp(0.95rem, 1.35vw, 1.2rem); color: #fff; background: var(--azure); border-radius: 2em; padding: 0.5em 1.4em; box-shadow: 0 5px 16px rgba(30,143,213,0.28); }
+
+/* ══════ HUD ══════ */
+.hud {
+  position: fixed; top: 3vh; right: 3vw; z-index: 150;
+  background: var(--white); border: 2px solid var(--line); border-radius: 16px;
+  overflow: hidden; display: none; min-width: 216px;
+  box-shadow: 0 8px 26px rgba(30,143,213,0.18);
+}
+.hud.show { display: block; }
+.hud .h-head { font-family: var(--head); background: var(--azure); color: #fff; font-weight: 700; font-size: 0.6rem; letter-spacing: 0.14em; padding: 0.45em 1em; }
+.hud .h-body { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem 0.7rem; }
+.hud .h-price { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; color: var(--ink); margin-bottom: 0.4rem; }
+.hud .h-badges { display: flex; gap: 0.3rem; }
+.hud .hb { font-family: var(--head); font-size: 0.5rem; letter-spacing: 0.05em; color: var(--faint); border: 1.5px solid var(--line); border-radius: 2em; padding: 0.32em 0.55em; font-weight: 700; transition: all 0.3s; }
+.hud .hb.on { color: var(--ink); background: var(--yellow); border-color: var(--yellow); }
+
+/* ══════ NAV / PRESENTER ══════ */
+.nav { position: fixed; bottom: 2.6vh; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 200; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; transition: all 0.25s; cursor: pointer; border: 2px solid var(--line); box-shadow: 0 1px 5px rgba(30,143,213,0.3); }
+.dot.active { background: var(--yellow); border-color: #fff; box-shadow: 0 2px 8px rgba(255,184,0,0.55); transform: scale(1.3); }
+.counter { position: fixed; top: 3.2vh; left: 3vw; font-family: var(--mono); font-size: 0.7rem; color: var(--faint); letter-spacing: 0.1em; z-index: 200; }
+
+.timer {
+  position: fixed; bottom: 3vh; right: 3vw; z-index: 300;
+  font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.08em;
+  color: var(--dim); background: var(--white);
+  border: 2px solid var(--line); border-radius: 8px;
+  padding: 0.25em 0.7em; display: none;
+  box-shadow: 0 4px 14px rgba(30,143,213,0.12);
+}
+.timer.running { color: var(--deep); }
+.timer.paused { color: var(--coral); }
+.timer.show { display: block; }
+
+.notes-drawer {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
+  background: rgba(42,55,67,0.97); color: #F2F7FB;
+  padding: 0.9rem 6vw 1.1rem; max-height: 26vh; overflow-y: auto;
+  font-family: system-ui, sans-serif; font-size: clamp(0.85rem,1.15vw,1rem); line-height: 1.55;
+  transform: translateY(100%); transition: transform 0.25s ease;
+  border-top: 3px solid var(--yellow);
+}
+.notes-drawer.open { transform: translateY(0); }
+.notes-drawer .nd-head { font-family: var(--head); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.45rem; font-weight: 700; }
+.notes-drawer .nd-head span { color: rgba(242,247,251,0.45); letter-spacing: 0.06em; text-transform: none; margin-left: 1em; font-family: system-ui, sans-serif; font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- ═══ S1 · COLD OPEN ═══ -->
+  <div class="slide" id="s1">
+    <img class="logo" src="assets/poolaroo.png" alt="Poolaroo">
+    <div class="hero-shot">
+      <div class="hero-prod">
+        <div class="photo-card"><img src="assets/hero-b2848v1.jpg" alt="Century 1 HP pool pump motor"></div>
+        <div class="hp-sku">SKU B2848V1</div>
+        <div class="hp-price">$331<span class="sun">.99</span></div>
+      </div>
+      <div class="hero-prod">
+        <div class="photo-card"><img src="assets/hero-jmblue032.jpg" alt="Jack's Magic The Blue Stuff"></div>
+        <div class="hp-sku">SKU JMBLUE032</div>
+        <div class="hp-price">$22<span class="sun">.99</span></div>
+      </div>
+    </div>
+    <div class="what">A pool-pump motor and a bottle of stain remover.<br>Two of the <strong>~2,000 prices we re-decide every hour</strong>.<br>Tonight, a peek in the back door at how.</div>
+    <div class="event-foot">Seattle Shopify &nbsp;&#183;&nbsp; Operators Teaching Operators &nbsp;&#183;&nbsp; July 9, 2026 &nbsp;&#183;&nbsp; Roy Steves</div>
+  </div>
+
+  <!-- ═══ S2 · THE NAIVE BELL (the model in your head) ═══ -->
+  <div class="slide chartslide" id="s2" style="justify-content:flex-start; padding-top:8vh;">
+    <div class="photo-card">
+      <img src="assets/hero-b2848v1.jpg" alt="Century 1 HP pool pump motor">
+      <div class="pc-cap">Century 1&nbsp;HP motor &#183; <span class="num">B2848V1</span></div>
+    </div>
+    <div class="tag"><span class="pill">Price Elasticity Like They Taught You in School</span></div>
+    <div class="headline">Classic <span class="sun">Volume</span> vs. <em>Margin</em> Balance</div>
+    <svg class="diagram bell" viewBox="0 0 1000 420" role="img" aria-label="Smooth bell of gross margin dollars, with landed cost and true break-even reference lines and a marketing-plus-overhead wedge">
+        <defs>
+          <clipPath id="pos1yellow"><rect x="211.4" y="0" width="172" height="280"/></clipPath>
+          <clipPath id="pos1blue"><rect x="383.4" y="0" width="566.6" height="280"/></clipPath>
+          <clipPath id="neg1"><rect x="0" y="280" width="1000" height="140"/></clipPath>
+        </defs>
+        <!-- fill under curve: yellow within the marketing+overhead wedge, blue past true break-even, red below zero -->
+        <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5 L 950,280 L 90,280 Z" fill="#FFB800" fill-opacity="0.15" clip-path="url(#pos1yellow)"/>
+        <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5 L 950,280 L 90,280 Z" fill="#1E8FD5" fill-opacity="0.07" clip-path="url(#pos1blue)"/>
+        <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5 L 950,280 L 90,280 Z" fill="#FF4E4E" fill-opacity="0.12" clip-path="url(#neg1)"/>
+        <!-- zero line (gross break-even) -->
+        <line x1="90" y1="280" x2="950" y2="280" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+        <text x="82" y="284" text-anchor="end" font-size="12" fill="#93A6B7">$0</text>
+        <!-- landed cost line -->
+        <line x1="211.4" y1="76" x2="211.4" y2="398" stroke="#FF4E4E" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.7"/>
+        <text x="211.4" y="66" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600" class="hd">landed cost $264</text>
+        <!-- true break-even line -->
+        <line x1="383.4" y1="76" x2="383.4" y2="398" stroke="#FF4E4E" stroke-width="2" stroke-dasharray="5,4" opacity="0.9"/>
+        <text x="383.4" y="66" text-anchor="middle" font-size="12" fill="#E03A3A" font-weight="700" class="hd">TRUE BREAK-EVEN $298</text>
+        <!-- wedge bracket -->
+        <line x1="211.4" y1="300" x2="383.4" y2="300" stroke="#E03A3A" stroke-width="1.5" opacity="0.7"/>
+        <text x="297.4" y="316" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600">marketing + overhead</text>
+        <!-- peak dropline -->
+        <line x1="585.8" y1="106.9" x2="585.8" y2="280" stroke="#93A6B7" stroke-width="1.5" stroke-dasharray="4,5" opacity="0.7"/>
+        <text x="585.8" y="298" text-anchor="middle" font-size="13.5" font-weight="700" fill="#007AB8" class="mono">$338</text>
+        <!-- bell -->
+        <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5" fill="none" stroke="#007AB8" stroke-width="4" stroke-linecap="round"/>
+        <!-- peak -->
+        <circle cx="585.8" cy="106.9" r="6.5" fill="#007AB8" stroke="#fff" stroke-width="2.5"/>
+        <text x="585.8" y="88" text-anchor="middle" font-size="13.5" font-weight="700" fill="#007AB8" class="hd">&#8220;Ideal&#8221; Price</text>
+        <!-- axis labels -->
+        <text transform="rotate(-90 34 215)" x="34" y="215" text-anchor="middle" font-size="12.5" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.08em">GROSS MARGIN $</text>
+        <text x="92" y="110" font-size="12" fill="#93A6B7">cheaper &#8592;</text>
+        <text x="948" y="110" text-anchor="end" font-size="12" fill="#93A6B7">&#8594; pricier</text>
+        <!-- red zone label (above the zero line for legibility) -->
+        <text x="98" y="252" font-size="12" fill="#E03A3A" font-weight="600">Below Cost:</text>
+        <text x="98" y="267" font-size="12" fill="#E03A3A">Bleed at Volume</text>
+        <!-- right collapse label (below the zero line, far right) -->
+        <text x="945" y="300" text-anchor="end" font-size="12.5" fill="#E67E22" font-weight="600">Too Expensive:</text>
+        <text x="945" y="317" text-anchor="end" font-size="12.5" fill="#E67E22">No Volume</text>
+      </svg>
+  </div>
+
+  <!-- ══ PRESERVED: former S2 six-store window board (moved off s2 2026-07-08). The six-store price data also appears as the price line on s9. Reinstate as its own slide after the sawtooth if wanted. ══
+    <div class="tag"><span class="pill">The stakes</span></div>
+    <div class="headline">Same motor. Six stores.<br>A <em>36% window.</em></div>
+    <div class="lede">Too high, you vanish from the comparison. Too low, you donate margin you'll never get back. Where you sit in that window <strong>is your margin</strong>.</div>
+    <div class="win-tabs">
+      <div class="win-tab"><span class="s">AquaPool</span><span class="p">$294.99</span></div>
+      <div class="win-tab"><span class="s">InyoPools</span><span class="p">$303.99</span></div>
+      <div class="win-tab"><span class="s">Amazon</span><span class="p">$319.95</span></div>
+      <div class="win-tab us"><span class="s">Poolaroo</span><span class="p">$332.99</span></div>
+      <div class="win-tab"><span class="s">PoolGeek</span><span class="p">$333.99</span></div>
+      <div class="win-tab"><span class="s">Leslie's</span><span class="p">$399.99</span></div>
+    </div>
+    <div class="prod-cap">
+      <img src="assets/hero-b2848v1.jpg" alt="">
+      <span class="t"><strong>Century 1&nbsp;HP pool pump motor</strong>, SKU B2848V1. Live prices this month.</span>
+    </div>
+    <div class="lede" style="margin-top:1.1rem; font-size:clamp(0.92rem,1.32vw,1.12rem);">Amazon is <strong>not</strong> the cheapest, and we sit fourth of six on purpose. That story lands at stop four.</div>
+    <div class="datasource">POOLAROO COMPETITION MONITOR · 8,131 LIVE PRICES · 73 STOREFRONTS · 2,793 PRODUCTS · JULY 2026</div>
+  ══ end preserved board ══ -->
+
+  <!-- ═══ S3 · THE SAWTOOTH (what actually happens) ═══ -->
+  <div class="slide chartslide" id="s3" style="justify-content:flex-start; padding-top:8vh;">
+    <div class="photo-card">
+      <img src="assets/hero-b2848v1.jpg" alt="Century 1 HP pool pump motor">
+      <div class="pc-cap">Century 1&nbsp;HP motor &#183; <span class="num">B2848V1</span></div>
+    </div>
+    <div class="tag"><span class="pill">Price Elasticity Snaps</span></div>
+    <div class="headline">Competitors&hellip;<br><span class="sun">Complicate</span> Things</div>
+    <svg class="diagram bell" viewBox="0 0 1000 420" role="img" aria-label="Sawtooth of real gross margin swinging around the bell, with a faint true-break-even ghost line the cheapest spike sits left of">
+      <defs>
+        <clipPath id="pos2yellow"><rect x="211.4" y="0" width="172" height="280"/></clipPath>
+        <clipPath id="pos2blue"><rect x="383.4" y="0" width="566.6" height="280"/></clipPath>
+        <clipPath id="neg2"><rect x="0" y="280" width="1000" height="140"/></clipPath>
+      </defs>
+      <!-- red loss lobe (shared left descent) -->
+      <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 L 90,280 Z" fill="#FF4E4E" fill-opacity="0.12" clip-path="url(#neg2)"/>
+      <!-- fill under the sawtooth: yellow within the marketing+overhead wedge, blue past true break-even -->
+      <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280 L 90,280 Z" fill="#FFB800" fill-opacity="0.15" clip-path="url(#pos2yellow)"/>
+      <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280 L 90,280 Z" fill="#1E8FD5" fill-opacity="0.07" clip-path="url(#pos2blue)"/>
+      <!-- faint true break-even ghost (from chart 1, no label) -->
+      <line x1="383.4" y1="181" x2="383.4" y2="280" stroke="#E03A3A" stroke-width="1.5" stroke-dasharray="3,4" opacity="0.35"/>
+      <!-- competitor labels -->
+      <g text-anchor="middle" class="hd">
+        <text x="350" y="213.2" font-size="11.5" fill="#5E7285" font-weight="600">AquaPool</text>
+        <text x="350" y="228.2" font-size="11" fill="#93A6B7" class="mono">$294.99</text>
+        <text x="415.8" y="201.7" font-size="11.5" fill="#5E7285" font-weight="600">InyoPools</text>
+        <text x="415.8" y="216.7" font-size="11" fill="#93A6B7" class="mono">$303.99</text>
+        <text x="496.7" y="182.5" font-size="11.5" fill="#5E7285" font-weight="600">Amazon</text>
+        <text x="496.7" y="197.5" font-size="11" fill="#93A6B7" class="mono">$319.95</text>
+        <text x="550" y="217.1" font-size="11.5" fill="#5E7285" font-weight="600">PoolGeek</text>
+        <text x="550" y="232.1" font-size="11" fill="#93A6B7" class="mono">$333.99</text>
+        <text x="899.8" y="225" font-size="11.5" fill="#5E7285" font-weight="600">Leslie's</text>
+        <text x="899.8" y="240" font-size="11" fill="#93A6B7" class="mono">$399.99</text>
+      </g>
+      <!-- zero line -->
+      <line x1="90" y1="280" x2="950" y2="280" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+      <text x="82" y="284" text-anchor="end" font-size="12" fill="#93A6B7">$0</text>
+      <!-- scale ticks: major at $100, minor at $25 -->
+      <g stroke="#CFE6F4">
+        <line x1="140.6" y1="277" x2="140.6" y2="283" stroke-width="1.5"/>
+        <line x1="267.1" y1="277" x2="267.1" y2="283" stroke-width="1.5"/>
+        <line x1="393.5" y1="273" x2="393.5" y2="287" stroke-width="2.5"/>
+        <line x1="520" y1="277" x2="520" y2="283" stroke-width="1.5"/>
+        <line x1="646.5" y1="277" x2="646.5" y2="283" stroke-width="1.5"/>
+        <line x1="772.9" y1="277" x2="772.9" y2="283" stroke-width="1.5"/>
+        <line x1="899.4" y1="273" x2="899.4" y2="287" stroke-width="2.5"/>
+      </g>
+      <text x="393.5" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$300</text>
+      <text x="899.4" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$400</text>
+      <!-- landed cost line -->
+      <line x1="211.4" y1="44" x2="211.4" y2="398" stroke="#FF4E4E" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.85"/>
+      <text x="211.4" y="40" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600" class="hd">landed cost $264</text>
+      <!-- ghost bell (the compare-to) -->
+      <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5" fill="none" stroke="#93A6B7" stroke-width="2.5" stroke-dasharray="7,6" opacity="0.75"/>
+      <!-- sawtooth: overshoot to cheapest slot, S-curved shelves, downhill gap, slam -->
+      <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- yellow anchor dots at competitor low points -->
+      <g fill="#FFB800" stroke="#fff" stroke-width="2">
+        <circle cx="370.3" cy="199.2" r="5"/>
+        <circle cx="415.8" cy="187.7" r="5"/>
+        <circle cx="496.7" cy="168.5" r="5"/>
+        <circle cx="568.6" cy="203.1" r="5"/>
+        <circle cx="899.4" cy="255" r="5"/>
+      </g>
+      <!-- crater connector at $338, extended to the zero line -->
+      <line x1="585.8" y1="117" x2="585.8" y2="280" stroke="#FF4E4E" stroke-width="2" stroke-dasharray="5,4"/>
+      <circle cx="585.8" cy="109" r="5" fill="#FF4E4E"/>
+      <circle cx="585.8" cy="204" r="6" fill="#fff" stroke="#FF4E4E" stroke-width="2.5"/>
+      <text x="585.8" y="298" text-anchor="middle" font-size="13.5" font-weight="700" fill="#E03A3A" class="mono">$338</text>
+      <text x="598" y="198" text-anchor="start" font-size="13.5" font-weight="700" fill="#E03A3A" class="hd">&#8220;Ideal&#8221; Price</text>
+      <!-- axis labels -->
+      <text transform="rotate(-90 34 215)" x="34" y="215" text-anchor="middle" font-size="12.5" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.08em">GROSS MARGIN $</text>
+      <text x="92" y="110" font-size="12" fill="#93A6B7">cheaper &#8592;</text>
+      <text x="948" y="110" text-anchor="end" font-size="12" fill="#93A6B7">&#8594; pricier</text>
+    </svg>
+  </div>
+
+  <!-- ══ PRESERVED: former S3 credentials slide (culled 2026-07-08). Reinstate later if wanted.
+       Speaker note was: "Quick credentials so you know where these lessons come from. In 2014 I advised a
+       price-intelligence startup, back when building scrapers WAS the business, and also why that business
+       was brutal to scale. Fifteen-plus years running StatBid, paid search from the operator's side. And now
+       Poolaroo: two thousand pool-and-spa SKUs, prices re-decided hourly by a system we built in-house. Third
+       run at this exact problem."
+    <div class="tag"><span class="pill">Hi, I'm Roy</span></div>
+    <div class="headline">Three runs at this<br><em>exact problem.</em></div>
+    <div class="cred-row">
+      <div class="cred-list">
+        <div class="cred"><span class="yr num">2014</span><span class="tx">Advisor to a price-intelligence startup<span>, back when custom scrapers were the whole business and the reason it couldn't scale.</span></span></div>
+        <div class="cred"><span class="yr num">2009+</span><span class="tx">Co-founder, StatBid<span>. Fifteen-plus years of paid search on the operator's side.</span></span></div>
+        <div class="cred"><span class="yr">Now</span><span class="tx">Co-founder, Poolaroo<span>. ~2,000 SKUs in pool &amp; spa, prices re-decided hourly by a system we built ourselves.</span></span></div>
+      </div>
+      <div class="cred-photo">
+        <img class="hs" src="assets/headshot.jpg" alt="Roy Steves">
+        <div class="lg"><img src="assets/poolaroo.png" alt="Poolaroo"></div>
+      </div>
+    </div>
+  ══ end preserved cred ══ -->
+
+  <!-- ═══ S6b · BLUE STUFF SAWTOOTH (the pattern generalizes) ═══ -->
+  <div class="slide chartslide" id="s6b" style="justify-content:flex-start; padding-top:8vh;">
+    <div class="photo-card">
+      <img class="spin" id="spinImgBlue" src="assets/spin-jmblue032/frame-01.jpg" alt="Jack's Magic The Blue Stuff">
+      <div class="pc-cap">Jack's Magic Blue Stuff &#183; <span class="num">JMBLUE032</span></div>
+    </div>
+    <div class="tag"><span class="pill">Price Elasticity Snaps</span></div>
+    <div class="headline">Competitors&hellip;<br><span class="sun">Complicate</span> Things</div>
+    <svg class="diagram bell" viewBox="0 0 1000 420" role="img" aria-label="Blue Stuff sawtooth, descending crests, us cheapest at the floor as the real peak, model ideal stranded mid-pack">
+      <defs>
+        <clipPath id="pos4yellow"><rect x="206.3" y="0" width="66.5" height="280"/></clipPath>
+        <clipPath id="pos4blue"><rect x="272.8" y="0" width="677.2" height="280"/></clipPath>
+        <clipPath id="neg4"><rect x="0" y="280" width="1000" height="140"/></clipPath>
+      </defs>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#FFB800" fill-opacity="0.15" clip-path="url(#pos4yellow)"/>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#1E8FD5" fill-opacity="0.07" clip-path="url(#pos4blue)"/>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#FF4E4E" fill-opacity="0.12" clip-path="url(#neg4)"/>
+      <line x1="272.8" y1="149" x2="272.8" y2="280" stroke="#E03A3A" stroke-width="1.5" stroke-dasharray="3,4" opacity="0.35"/>
+      <line x1="90" y1="280" x2="950" y2="280" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+      <text x="82" y="284" text-anchor="end" font-size="12" fill="#93A6B7">$0</text>
+      <g stroke="#CFE6F4">
+        <line x1="154.5" y1="277" x2="154.5" y2="283" stroke-width="1.5"/>
+        <line x1="262" y1="273" x2="262" y2="287" stroke-width="2.5"/>
+        <line x1="369.5" y1="277" x2="369.5" y2="283" stroke-width="1.5"/>
+        <line x1="477" y1="273" x2="477" y2="287" stroke-width="2.5"/>
+        <line x1="584.5" y1="277" x2="584.5" y2="283" stroke-width="1.5"/>
+        <line x1="692" y1="273" x2="692" y2="287" stroke-width="2.5"/>
+        <line x1="799.5" y1="277" x2="799.5" y2="283" stroke-width="1.5"/>
+        <line x1="907" y1="273" x2="907" y2="287" stroke-width="2.5"/>
+      </g>
+      <text x="262" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$20</text>
+      <text x="477" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$30</text>
+      <text x="692" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$40</text>
+      <text x="907" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$50</text>
+      <line x1="206.3" y1="44" x2="206.3" y2="398" stroke="#FF4E4E" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.85"/>
+      <text x="206.3" y="40" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600" class="hd">landed cost $17.41</text>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,249.2 Q 262.0,218.5 299.6,193.5 Q 337.3,168.5 374.9,147.3 Q 412.5,126.2 444.8,117.5 Q 477.0,108.9 498.5,107.9 Q 520.0,106.9 552.3,112.7 Q 584.5,118.5 627.5,139.6 Q 670.5,160.8 713.5,185.8 Q 756.5,210.8 788.8,226.2 Q 821.0,241.5 853.3,252.1 Q 885.5,262.7 917.8,267.5 L 950.0,272.3" fill="none" stroke="#93A6B7" stroke-width="2.5" stroke-dasharray="7,6" opacity="0.75"/>
+      <line x1="520" y1="114" x2="520" y2="172" stroke="#FF4E4E" stroke-width="2" stroke-dasharray="5,4"/>
+      <circle cx="520" cy="106.9" r="5" fill="#FF4E4E"/>
+      <circle cx="520" cy="178.5" r="6" fill="#fff" stroke="#FF4E4E" stroke-width="2.5"/>
+      <text x="533" y="103" text-anchor="start" font-size="13.5" font-weight="700" fill="#E03A3A" class="hd">&#8220;Ideal&#8221; Price</text>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <g fill="#FFB800" stroke="#fff" stroke-width="2">
+        <circle cx="352.3" cy="187.7" r="5"/>
+        <circle cx="461.9" cy="203.1" r="5"/>
+        <circle cx="526.4" cy="210.8" r="5"/>
+        <circle cx="590.9" cy="222.3" r="5"/>
+        <circle cx="698.4" cy="241.5" r="5"/>
+        <circle cx="859.7" cy="268.0" r="5"/>
+      </g>
+      <g text-anchor="middle" class="hd">
+        <text x="352.3" y="203" font-size="11" fill="#5E7285" font-weight="600">PoolPartsUnl.</text>
+        <text x="352.3" y="217" font-size="10.5" fill="#93A6B7" class="mono">$23.77</text>
+        <text x="461.9" y="218" font-size="11" fill="#5E7285" font-weight="600">Amazon</text>
+        <text x="461.9" y="232" font-size="10.5" fill="#93A6B7" class="mono">$29.07</text>
+        <text x="526.4" y="226" font-size="11" fill="#5E7285" font-weight="600">PoolGeek</text>
+        <text x="526.4" y="240" font-size="10.5" fill="#93A6B7" class="mono">$31.99</text>
+        <text x="590.9" y="237" font-size="11" fill="#5E7285" font-weight="600">AquaPoolSup.</text>
+        <text x="590.9" y="251" font-size="10.5" fill="#93A6B7" class="mono">$34.99</text>
+        <text x="698.4" y="257" font-size="11" fill="#5E7285" font-weight="600">InyoPools</text>
+        <text x="698.4" y="271" font-size="10.5" fill="#93A6B7" class="mono">$39.99</text>
+        <text x="869" y="237" text-anchor="start" font-size="11" fill="#5E7285" font-weight="600">Leslie's</text>
+        <text x="869" y="251" text-anchor="start" font-size="10.5" fill="#93A6B7" class="mono">$47.99</text>
+      </g>
+      <!-- gold "us &#183; cheapest" $22.99 marker removed 2026-07-08 — called out verbally -->
+
+      <text transform="rotate(-90 34 215)" x="34" y="215" text-anchor="middle" font-size="12.5" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.08em">GROSS MARGIN $</text>
+      <text x="92" y="110" font-size="12" fill="#93A6B7">cheaper &#8592;</text>
+      <text x="948" y="110" text-anchor="end" font-size="12" fill="#93A6B7">&#8594; pricier</text>
+    </svg>
+  </div>
+
+  <!-- ═══ S4 · THE TOUR ═══ -->
+  <div class="slide" id="s4" style="justify-content:flex-start; padding-top:10vh;">
+    <div class="dualhud">
+      <div class="trackcard motor">
+        <div class="th">FOLLOWING &#183; SKU B2848V1</div>
+        <div class="tbody">
+          <img class="timg" src="assets/hero-b2848v1.jpg" alt="">
+          <div class="tcol">
+            <div class="tp">$332.99</div>
+            <div class="tbadges"><span class="tb-pill">SCRAPE</span><span class="tb-pill">MATCH</span><span class="tb-pill">COSTS</span><span class="tb-pill">PRICE</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="trackcard bottle">
+        <div class="th">FOLLOWING &#183; SKU JMBLUE032</div>
+        <div class="tbody">
+          <img class="timg" src="assets/hero-jmblue032.jpg" alt="">
+          <div class="tcol">
+            <div class="tp">$22.99</div>
+            <div class="tbadges"><span class="tb-pill">SCRAPE</span><span class="tb-pill">MATCH</span><span class="tb-pill">COSTS</span><span class="tb-pill">PRICE</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tag"><span class="pill">The Four Big Questions</span></div>
+
+    <div class="stops qlist">
+      <div class="stop"><span class="n">1</span><div class="qtext"><span class="qh">Who else sells it?</span><span class="qs">Crawling and Scraping Data</span></div></div>
+      <div class="stop"><span class="n">2</span><div class="qtext"><span class="qh">Is it the same product?</span><span class="qs">UPC &amp; SKU Matching</span></div></div>
+      <div class="stop"><span class="n">3</span><div class="qtext"><span class="qh">What does it cost us?</span><span class="qs">COGS + Net Shipping + Overhead</span></div></div>
+      <div class="stop"><span class="n">4</span><div class="qtext"><span class="qh">What's the best Price?</span><span class="qs">Margin vs. Competitive Position</span></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ S5b · COMPETITOR BREAKOUT (the motor's rivals) ═══ -->
+  <div class="slide" id="s5b" style="justify-content:flex-start; padding-top:10vh;">
+    <div class="tag"><span class="pill">The Four Big Questions</span></div>
+
+    <div class="stops qlist">
+      <div class="stop"><span class="n">1</span><div class="qtext"><span class="qh">Who else sells it?</span><span class="qs">Crawling and Scraping Data</span></div></div>
+    </div>
+
+    <!-- Competitor logos in logos/ (relative to this file). Per-logo max-height (inline) normalizes
+         visual weight: tight wordmarks smaller, whitespace-padded ones (Amazon, PoolGeek) larger.
+         Inyo has two options — inyo_wide.png (used, matches the row) or inyo_square.jpg. -->
+    <div class="complogos">
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/aqua-pool-supply-logo.png" alt="AquaPool Supply" style="max-height:44px"></div><span class="cp-price">$294.99</span></div>
+        <div class="compid"><span class="k">UPC</span><span class="v">786674076625</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/inyo_wide.png" alt="InyoPools" style="max-height:38px"></div><span class="cp-price">$303.99</span></div>
+        <div class="compid"><span class="k">UPC</span><span class="v">786674076625</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/amazon.png" alt="Amazon" style="max-height:64px"></div><span class="cp-price">$319.95</span></div>
+        <div class="compid"><span class="k">ASIN</span><span class="v">B09WVC3CCF</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/poolgeek.png" alt="PoolGeek" style="max-height:58px"></div><span class="cp-price">$333.99</span></div>
+        <div class="compid"><span class="k">MPN</span><span class="v">B2848V1</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/leslies.png" alt="Leslie's" style="max-height:46px"></div><span class="cp-price">$399.99</span></div>
+        <div class="compid"><span class="k">MPN</span><span class="v">B2848V1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S5c · SCRAPE METHOD (the how — one box per competitor) ═══ -->
+  <div class="slide" id="s5c" style="justify-content:flex-start; padding-top:10vh;">
+    <div class="tag"><span class="pill">The Four Big Questions</span></div>
+
+    <div class="stops qlist">
+      <div class="stop"><span class="n">1</span><div class="qtext"><span class="qh">Who else sells it?</span><span class="qs">Crawling and Scraping Data</span></div></div>
+    </div>
+
+    <div class="complogos">
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/aqua-pool-supply-logo.png" alt="AquaPool Supply" style="max-height:44px"></div><span class="cp-price">$294.99</span></div>
+        <div class="compid"><span class="k">UPC</span><span class="v">786674076625</span></div>
+        <div class="comphow how-generic">Generic JSON-LD<span class="hs">free &#183; automatic</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/inyo_wide.png" alt="InyoPools" style="max-height:38px"></div><span class="cp-price">$303.99</span></div>
+        <div class="compid"><span class="k">UPC</span><span class="v">786674076625</span></div>
+        <div class="comphow how-custom">Custom parser<span class="hs">built per-site</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/amazon.png" alt="Amazon" style="max-height:64px"></div><span class="cp-price">$319.95</span></div>
+        <div class="compid"><span class="k">ASIN</span><span class="v">B09WVC3CCF</span></div>
+        <div class="comphow how-keepa">Keepa API<span class="hs">paid &#183; metered</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/poolgeek.png" alt="PoolGeek" style="max-height:58px"></div><span class="cp-price">$333.99</span></div>
+        <div class="compid"><span class="k">MPN</span><span class="v">B2848V1</span></div>
+        <div class="comphow how-custom">Custom parser<span class="hs">built per-site</span></div>
+      </div>
+      <div class="compcol">
+        <div class="complogo"><div class="logo-slot"><img src="logos/leslies.png" alt="Leslie's" style="max-height:46px"></div><span class="cp-price">$399.99</span></div>
+        <div class="compid"><span class="k">MPN</span><span class="v">B2848V1</span></div>
+        <div class="comphow how-custom">Custom parser<span class="hs">built per-site</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S7 · Q2 IDENTITY ═══ -->
+  <div class="slide" id="s7" style="justify-content:flex-start; padding-top:9vh;">
+    <div class="tag"><span class="pill">Stop 2</span><span class="after">Is that even the same motor?</span></div>
+    <div class="headline">A price for the<br>wrong product<br>is <span class="coral">worse than no price.</span></div>
+
+    <div class="cascade">
+      <div class="casc-step"><span class="cn gold">&nbsp;</span><div class="inner"><div class="ch">Manual override</div><div class="cd">A human locked this answer.<br>Nothing outranks it.</div></div></div>
+      <div class="casc-arrow" aria-hidden="true">&gt;</div>
+      <div class="casc-step"><span class="cn"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span><div class="inner"><div class="ch">UPC match</div><div class="cd">Equivalence-aware: Pentair ships the same part under Z-suffix twins.</div></div></div>
+      <div class="casc-arrow" aria-hidden="true">&gt;</div>
+      <div class="casc-step"><span class="cn"><span class="on">&#9733;&#9733;&#9733;</span><span class="off">&#9733;&#9733;</span></span><div class="inner"><div class="ch">SKU/MPN + Brand</div><div class="cd">Part number alone lies across brands. Brand has to agree.</div></div></div>
+      <div class="casc-arrow" aria-hidden="true">&gt;</div>
+      <div class="casc-step"><span class="cn"><span class="on">&#9733;&#9733;</span><span class="off">&#9733;&#9733;&#9733;</span></span><div class="inner"><div class="ch">Product Title</div><div class="cd">Either extracting MPN or matching our title.</div></div></div>
+    </div>
+
+    <div class="chip-row skip" style="width:fit-content;">
+      <span class="lbl">None of the Above?</span>
+      <span class="txt"><strong>Skip it.</strong> One wrong match poisons every decision downstream.</span>
+    </div>
+  </div>
+
+  <!-- ═══ S8 · MATCH (bottle answer-key vs how each rival identifies it) ═══ -->
+  <div class="slide" id="smatch" style="justify-content:flex-start; padding-top:8vh;">
+    <div class="tag"><span class="pill">Matching Products</span></div>
+    <div class="headline">The Bottle of <em>Many Names</em></div>
+
+    <div class="matchwrap">
+      <div class="matchleft">
+        <div class="matchhead"><span>Price</span><span>Seller</span><span>Match</span><span>Value</span><span class="tr">Trust</span></div>
+        <div class="matchrow"><span class="mprice">$23.77</span><span class="cname">Pool Parts Unlimited</span><span class="mtype mt-title">Title</span><span class="mval only">name only</span><span class="stars"><span class="on">&#9733;&#9733;</span><span class="off">&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$23.99</span><span class="cname">Yard &amp; Pool</span><span class="mtype mt-upc">UPC</span><span class="mval">734040538710</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$29.07</span><span class="cname">Amazon</span><span class="mtype mt-asin">ASIN</span><span class="mval">B001EBCPMK</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;</span><span class="off">&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$29.99</span><span class="cname">PoolSupplies.com</span><span class="mtype mt-title">Title</span><span class="mval only">name only</span><span class="stars"><span class="on">&#9733;&#9733;</span><span class="off">&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$31.95</span><span class="cname">Sunplay</span><span class="mtype mt-upc">UPC</span><span class="mval">734040538710</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$31.99</span><span class="cname">PoolGeek</span><span class="mtype mt-upc">UPC</span><span class="mval">734040538710</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$32.99</span><span class="cname">Discount Pool Mart</span><span class="mtype mt-mpn">MPN</span><span class="mval">JMBLUE032</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;</span><span class="off">&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$34.99</span><span class="cname">AquaPool Supply</span><span class="mtype mt-upc">UPC</span><span class="mval">734040538710</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$37.16</span><span class="cname">Pool Supply Unlimited</span><span class="mtype mt-title">Title</span><span class="mval only">name only</span><span class="stars"><span class="on">&#9733;&#9733;</span><span class="off">&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$39.99</span><span class="cname">InyoPools</span><span class="mtype mt-upc">UPC</span><span class="mval">734040538710</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$47.99</span><span class="cname">In The Swim</span><span class="mtype mt-title">Title</span><span class="mval only">name only</span><span class="stars"><span class="on">&#9733;&#9733;</span><span class="off">&#9733;&#9733;&#9733;</span></span></div>
+        <div class="matchrow"><span class="mprice">$47.99</span><span class="cname">Leslie's</span><span class="mtype mt-mpn">MPN</span><span class="mval">JMBLUE032</span><span class="stars"><span class="on">&#9733;&#9733;&#9733;</span><span class="off">&#9733;&#9733;</span></span></div>
+      </div>
+
+      <div class="matchright">
+        <div class="ourcard">
+          <div class="ourhead">Our product &#183; the answer key</div>
+          <img class="spin" id="spinImgMatch" src="assets/spin-jmblue032/frame-01.jpg" alt="Jack's Magic The Blue Stuff">
+          <div class="ourtitle">Jack's Magic Blue Stuff Pool Stain Remover, 32&nbsp;oz</div>
+          <div class="ourid">
+            <div class="oid"><span class="k">UPC</span><span class="v">734040538710</span></div>
+            <div class="oid"><span class="k">MPN / SKU</span><span class="v">JMBLUE032</span></div>
+            <div class="oid"><span class="k">Brand</span><span class="v">Jack's Magic</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRESERVED: former S5/gauntlet "Amazon makes you work for it" (replaced by the MATCH slide 2026-07-08).
+       Speaker note (NOTES.s5) retained in the script. Reinstate if the Amazon-scraping-friction beat is wanted.
+    <div class="tag"><span class="pill">Stop 1</span><span class="after">Who else sells this motor?</span></div>
+    <div class="headline">Amazon makes you<br><em>work for it.</em></div>
+    <div class="hurdles">
+      <div class="hurd"><div class="h">No price API</div><div class="d">And the storefront actively resists. Raw scraping is a treadmill.</div></div>
+      <div class="hurd"><div class="h">You pay to get in</div><div class="d">Keepa: ~&euro;49/mo, metered tokens. The data exists, behind a meter.</div></div>
+      <div class="hurd"><div class="h">Their ASIN &#8644; your UPC</div><div class="d">Which of their listings is even your product? Nobody hands you that mapping.</div></div>
+      <div class="hurd"><div class="h">Whose price is the buybox?</div><div class="d">Amazon-the-retailer, or a third-party seller? Plus quirks: forget <code>rating=1</code> and reviews come back empty.</div></div>
+    </div>
+    <div class="splash">All real work. But this step used to be <strong>the expensive part</strong> &mdash;</div>
+  ══ end preserved gauntlet ══ -->
+
+  <!-- ═══ S8 · Q3 LANDED ═══ -->
+  <div class="slide" id="s8" style="justify-content:flex-start; padding-top:9vh;">
+    <div class="tag"><span class="pill">Net Shipping</span></div>
+    <div class="headline">Shipping is <em>signed</em>,<br>and it varies widely.</div>
+    <div class="lede">Net shipping is what the carrier bills you <strong>minus</strong> what the customer pays you.<br>We charge a flat <strong class="num">$9.99</strong> under $100, free over $100.</div>
+
+    <svg class="diagram" viewBox="0 0 1000 210" style="max-height:29vh; margin-top:-1.9rem; max-width:1050px;">
+      <!-- axis: -$10 → +$50, 14.83 px/$ from x=60 -->
+      <line x1="60" y1="120" x2="950" y2="120" stroke="#CFE6F4" stroke-width="4" stroke-linecap="round"/>
+      <line x1="208" y1="106" x2="208" y2="134" stroke="#93A6B7" stroke-width="2.5"/>
+      <text x="208" y="158" text-anchor="middle" font-size="14" fill="#5E7285" class="mono">$0</text>
+      <text x="62" y="52" font-size="12.5" fill="#93A6B7" font-weight="500">they pay us to ship it</text>
+      <text x="948" y="52" text-anchor="end" font-size="12.5" fill="#93A6B7" font-weight="500">we eat the freight</text>
+
+      <!-- drain plug -->
+      <circle cx="116" cy="120" r="13" fill="#fff" stroke="#1E8FD5" stroke-width="6"/>
+      <text x="116" y="86" text-anchor="middle" font-size="17" font-weight="600" fill="#007AB8" class="mono">&minus;$6.24</text>
+      <text x="116" y="186" text-anchor="middle" font-size="13.5" fill="#2A3743" font-weight="600">$14.99 drain plug</text>
+      <text x="116" y="204" text-anchor="middle" font-size="11.5" fill="#93A6B7">fee &gt; carrier bill</text>
+
+      <!-- motor -->
+      <circle cx="462" cy="120" r="15" fill="#FFB800" stroke="#fff" stroke-width="5"/>
+      <circle cx="462" cy="120" r="24" fill="none" stroke="#FFB800" stroke-width="2" opacity="0.4"/>
+      <text x="462" y="82" text-anchor="middle" font-size="18" font-weight="600" fill="#C98F00" class="mono">+$17.10</text>
+      <text x="462" y="186" text-anchor="middle" font-size="13.5" fill="#2A3743" font-weight="600">our motor, 33 lb</text>
+      <text x="462" y="204" text-anchor="middle" font-size="11.5" fill="#93A6B7">free ship &gt; $100, we absorb it</text>
+
+      <!-- handrail -->
+      <circle cx="892" cy="120" r="13" fill="#fff" stroke="#FF4E4E" stroke-width="6"/>
+      <text x="892" y="86" text-anchor="middle" font-size="17" font-weight="600" fill="#E03A3A" class="mono">+$46.08</text>
+      <text x="892" y="186" text-anchor="middle" font-size="13.5" fill="#2A3743" font-weight="600">$310.99 deck handrail</text>
+      <text x="892" y="204" text-anchor="middle" font-size="11.5" fill="#93A6B7">15% of the ticket</text>
+    </svg>
+
+    <div class="splash" style="max-width:none; width:fit-content;">This applies to sites with a Free Shipping threshold.<br>Paid shipping and Always-Free shipping models have their own compromises.</div>
+  </div>
+
+  <!-- ═══ S9 · COSTS (two products' cost inputs, side by side) ═══ -->
+  <div class="slide" id="scost" style="justify-content:flex-start; padding-top:7vh;">
+    <div class="tag"><span class="pill">Costs</span></div>
+    <div class="headline">What it <em>really</em> costs us.</div>
+
+    <div class="costwrap">
+      <div class="costcard">
+        <div class="cchead">
+          <img src="assets/hero-b2848v1.jpg" alt="">
+          <div><div class="nm">Century 1&nbsp;HP Motor</div><div class="sk">B2848V1</div></div>
+        </div>
+        <div class="crow"><span class="lb">COGS <small>our unit cost, cheapest source</small></span><span class="vl">$246.99</span></div>
+        <div class="crow ship"><span class="lb">Est. <span class="net">Net</span> Shipping <small>modelled on weight &amp; category</small></span><span class="vl pos">+$17.59</span></div>
+        <div class="crow landed"><span class="lb">Landed cost</span><span class="vl">$264.58</span></div>
+        <div class="ccurve"><div class="box"><span class="cl">Base curve<br>target margin</span><span class="cm">26%</span></div></div>
+      </div>
+      <div class="costcard">
+        <div class="cchead">
+          <img src="assets/hero-jmblue032.jpg" alt="">
+          <div><div class="nm">Blue Stuff, 32&nbsp;oz</div><div class="sk">JMBLUE032</div></div>
+        </div>
+        <div class="crow"><span class="lb">COGS <small>our unit cost, cheapest source</small></span><span class="vl">$18.21</span></div>
+        <div class="crow ship"><span class="lb">Est. <span class="net">Net</span> Shipping <small>based on <span class="hl">real invoices</span></small></span><span class="vl neg">&minus;$0.80</span></div>
+        <div class="crow landed"><span class="lb">Landed cost</span><span class="vl">$17.41</span></div>
+        <div class="ccurve"><div class="box"><span class="cl">Base curve<br>target margin</span><span class="cm">48%</span></div></div>
+      </div>
+    </div>
+
+    <div class="costcurve">
+      <svg viewBox="0 0 1000 270" role="img" aria-label="Base margin curve: target gross margin percent versus landed cost, with the motor and bottle plotted on it">
+        <line x1="90" y1="210" x2="950" y2="210" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+        <text transform="rotate(-90 32 128)" x="32" y="128" text-anchor="middle" font-size="12" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.06em">TARGET MARGIN %</text>
+        <text x="950" y="234" text-anchor="end" font-size="11.5" fill="#93A6B7">landed cost &#8594;</text>
+        <!-- hand-tuned anchor knots -->
+        <g fill="#93A6B7">
+          <circle cx="90" cy="58.9" r="3.5"/><circle cx="107.2" cy="58.9" r="3.5"/><circle cx="133" cy="115.6" r="3.5"/>
+          <circle cx="176" cy="153.4" r="3.5"/><circle cx="262" cy="161" r="3.5"/><circle cx="520" cy="168.5" r="3.5"/><circle cx="950" cy="191.2" r="3.5"/>
+        </g>
+        <!-- interpolated curve -->
+        <path d="M 90,58.9 L 107.2,58.9 L 133,115.6 L 176,153.4 L 262,161 L 520,168.5 L 950,191.2" fill="none" stroke="#1E8FD5" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- bottle on the curve -->
+        <line x1="119.9" y1="86.9" x2="119.9" y2="210" stroke="#FFB800" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.85"/>
+        <circle cx="119.9" cy="86.9" r="7" fill="#FFB800" stroke="#fff" stroke-width="2.5"/>
+        <text x="134" y="82" font-size="15" font-weight="700" fill="#C98F00" class="hd">48%</text>
+        <text x="119.9" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="#2A3743" class="hd">Blue Stuff</text>
+        <text x="119.9" y="246" text-anchor="middle" font-size="11" fill="#5E7285" class="mono">$17.41</text>
+        <!-- motor on the curve -->
+        <line x1="545" y1="169.8" x2="545" y2="210" stroke="#FFB800" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.85"/>
+        <circle cx="545" cy="169.8" r="7" fill="#FFB800" stroke="#fff" stroke-width="2.5"/>
+        <text x="559" y="166" font-size="15" font-weight="700" fill="#C98F00" class="hd">26%</text>
+        <text x="545" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="#2A3743" class="hd">Motor</text>
+        <text x="545" y="246" text-anchor="middle" font-size="11" fill="#5E7285" class="mono">$264.58</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ══ PRESERVED: former S6 economics "In 2014 this step was the industry" (replaced by the COSTS slide 2026-07-08).
+       Speaker note (NOTES.s6) retained. Reinstate the parser-economics beat if wanted.
+    <div class="tag"><span class="pill">Stop 1</span><span class="after">Who else sells this motor?</span></div>
+    <div class="headline">In 2014, this step<br><em>was the industry.</em></div>
+    <div class="era-grid">
+      <div>
+        <div class="era"><div class="cap"></div><div><div class="yr num">2014</div><div class="tx">Custom scraper development, per site, always breaking. <span>The cost line that kept every price-intelligence company from scaling. I watched from inside one.</span></div></div></div>
+        <div class="era"><div class="cap" style="background:var(--yellow);"></div><div><div class="yr num">2025+</div><div class="tx">Commerce consolidated onto a few platforms. JSON-LD on every storefront<span>: machine-readable prices, published so Google will reward them.</span> And AI writes the parser in an afternoon.</div></div></div>
+        <div class="mag-bars">
+          <div class="mag-row"><span class="lab">3 days<br>by hand</span><div class="bar" style="width:6%; background:var(--faint);"></div><span class="val" style="color:var(--dim);">1,600</span></div>
+          <div class="mag-row"><span class="lab">24 hrs<br>crawler</span><div class="bar" style="width:66%; background:var(--azure);"></div><span class="val" style="color:var(--deep);">24,000</span></div>
+        </div>
+        <div style="margin-top:1rem; font-size:clamp(0.85rem,1.2vw,1rem); color:var(--ink); line-height:1.5;">Still true this week: <span class="num" style="color:var(--deep); font-weight:600;">3,380</span> dormant matches priced in <span class="num" style="color:var(--deep); font-weight:600;">77 minutes</span>, three nights before this talk. Zero blocks.</div>
+      </div>
+      <div>
+        <div class="move-card no"><span class="lb">&#10005;&nbsp; WHAT MOST PEOPLE TRY</span><div class="inner"><div class="hd">Point AI at every price</div><div class="bd">SKUs &times; competitors &times; every night. A token bill that scales with your catalog forever, and tokens are getting pricier, not cheaper.</div></div></div>
+        <div class="move-card yes"><span class="lb">&#10003;&nbsp; WHAT WE DO INSTEAD</span><div class="inner"><div class="hd">Point AI at the parser</div><div class="bd">Build once per site. Runtime is deterministic: fast, auditable, and cheap enough to ignore. The manual pass came first; that's what taught us the patterns.</div></div></div>
+      </div>
+    </div>
+  ══ end preserved economics ══ -->
+
+  <!-- ═══ S9 · PICKING THE PRICE (both sawtooths, consolidated from S9+S10) ═══ -->
+  <div class="slide" id="s9" style="justify-content:flex-start; padding-top:7vh;">
+    <div class="tag"><span class="pill">Picking the Price</span></div>
+    <div class="headline">Local Maximum Depends on <em>Product</em>.</div>
+
+    <div class="duowrap">
+      <div class="duocol">
+        <svg class="diagram bell" viewBox="0 0 1000 420" role="img" aria-label="Blue Stuff sawtooth: descending crests, the floor is the real peak">
+      <defs>
+        <clipPath id="pos4yellowB"><rect x="206.3" y="0" width="66.5" height="280"/></clipPath>
+        <clipPath id="pos4blueB"><rect x="272.8" y="0" width="677.2" height="280"/></clipPath>
+        <clipPath id="neg4B"><rect x="0" y="280" width="1000" height="140"/></clipPath>
+      </defs>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#FFB800" fill-opacity="0.15" clip-path="url(#pos4yellowB)"/>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#1E8FD5" fill-opacity="0.07" clip-path="url(#pos4blueB)"/>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0 L 950,280 L 90,280 Z" fill="#FF4E4E" fill-opacity="0.12" clip-path="url(#neg4B)"/>
+      <line x1="272.8" y1="149" x2="272.8" y2="280" stroke="#E03A3A" stroke-width="1.5" stroke-dasharray="3,4" opacity="0.35"/>
+      <line x1="90" y1="280" x2="950" y2="280" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+      <text x="82" y="284" text-anchor="end" font-size="12" fill="#93A6B7">$0</text>
+      <g stroke="#CFE6F4">
+        <line x1="154.5" y1="277" x2="154.5" y2="283" stroke-width="1.5"/><line x1="262" y1="273" x2="262" y2="287" stroke-width="2.5"/>
+        <line x1="369.5" y1="277" x2="369.5" y2="283" stroke-width="1.5"/><line x1="477" y1="273" x2="477" y2="287" stroke-width="2.5"/>
+        <line x1="584.5" y1="277" x2="584.5" y2="283" stroke-width="1.5"/><line x1="692" y1="273" x2="692" y2="287" stroke-width="2.5"/>
+        <line x1="799.5" y1="277" x2="799.5" y2="283" stroke-width="1.5"/><line x1="907" y1="273" x2="907" y2="287" stroke-width="2.5"/>
+      </g>
+      <text x="262" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$20</text>
+      <text x="477" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$30</text>
+      <text x="692" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$40</text>
+      <text x="907" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$50</text>
+      <line x1="206.3" y1="44" x2="206.3" y2="398" stroke="#FF4E4E" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.85"/>
+      <text x="206.3" y="40" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600" class="hd">landed cost $17.41</text>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,249.2 Q 262.0,218.5 299.6,193.5 Q 337.3,168.5 374.9,147.3 Q 412.5,126.2 444.8,117.5 Q 477.0,108.9 498.5,107.9 Q 520.0,106.9 552.3,112.7 Q 584.5,118.5 627.5,139.6 Q 670.5,160.8 713.5,185.8 Q 756.5,210.8 788.8,226.2 Q 821.0,241.5 853.3,252.1 Q 885.5,262.7 917.8,267.5 L 950.0,272.3" fill="none" stroke="#93A6B7" stroke-width="2.5" stroke-dasharray="7,6" opacity="0.75"/>
+      <line x1="520" y1="114" x2="520" y2="172" stroke="#FF4E4E" stroke-width="2" stroke-dasharray="5,4"/>
+      <circle cx="520" cy="106.9" r="5" fill="#FF4E4E"/>
+      <circle cx="520" cy="178.5" r="6" fill="#fff" stroke="#FF4E4E" stroke-width="2.5"/>
+      <text x="533" y="103" text-anchor="start" font-size="13.5" font-weight="700" fill="#E03A3A" class="hd">&#8220;Ideal&#8221; Price</text>
+      <path d="M 90.0,385.8 Q 143.8,330.0 162.0,314.6 Q 180.3,299.2 193.3,289.6 Q 206.3,280.0 234.2,224.2 Q 262.0,168.5 283.5,130.0 Q 305.0,91.5 322.2,75.2 L 339.4,58.9 L 352.3,187.7 C 394.7,187.7 410.9,141.5 453.3,141.5 L 461.9,203.1 C 484.5,203.1 493.1,156.9 515.7,156.9 L 526.4,210.8 C 549.0,210.8 557.6,176.2 580.2,176.2 L 590.9,222.3 C 631.6,222.3 647.1,203.1 687.7,203.1 L 698.4,241.5 C 755.0,241.5 825.0,220.0 848.0,220.0 L 859.7,268.0 L 950.0,268.0" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <g fill="#FFB800" stroke="#fff" stroke-width="2">
+        <circle cx="352.3" cy="187.7" r="5"/><circle cx="461.9" cy="203.1" r="5"/><circle cx="526.4" cy="210.8" r="5"/>
+        <circle cx="590.9" cy="222.3" r="5"/><circle cx="698.4" cy="241.5" r="5"/><circle cx="859.7" cy="268.0" r="5"/>
+      </g>
+      <g text-anchor="middle" class="hd">
+        <text x="352.3" y="203" font-size="11" fill="#5E7285" font-weight="600">PoolPartsUnl.</text>
+        <text x="352.3" y="217" font-size="10.5" fill="#93A6B7" class="mono">$23.77</text>
+        <text x="461.9" y="218" font-size="11" fill="#5E7285" font-weight="600">Amazon</text>
+        <text x="461.9" y="232" font-size="10.5" fill="#93A6B7" class="mono">$29.07</text>
+        <text x="526.4" y="226" font-size="11" fill="#5E7285" font-weight="600">PoolGeek</text>
+        <text x="526.4" y="240" font-size="10.5" fill="#93A6B7" class="mono">$31.99</text>
+        <text x="590.9" y="237" font-size="11" fill="#5E7285" font-weight="600">AquaPoolSup.</text>
+        <text x="590.9" y="251" font-size="10.5" fill="#93A6B7" class="mono">$34.99</text>
+        <text x="698.4" y="257" font-size="11" fill="#5E7285" font-weight="600">InyoPools</text>
+        <text x="698.4" y="271" font-size="10.5" fill="#93A6B7" class="mono">$39.99</text>
+        <text x="869" y="237" text-anchor="start" font-size="11" fill="#5E7285" font-weight="600">Leslie's</text>
+        <text x="869" y="251" text-anchor="start" font-size="10.5" fill="#93A6B7" class="mono">$47.99</text>
+      </g>
+      <text transform="rotate(-90 34 215)" x="34" y="215" text-anchor="middle" font-size="12.5" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.08em">GROSS MARGIN $</text>
+      <text x="92" y="110" font-size="12" fill="#93A6B7">cheaper &#8592;</text>
+      <text x="948" y="110" text-anchor="end" font-size="12" fill="#93A6B7">&#8594; pricier</text>
+    </svg>
+        <div class="duocard">
+          <img class="spin" id="spinImgDuo" src="assets/spin-jmblue032/frame-01.jpg" alt="Blue Stuff">
+          <div class="dc-t"><div class="nm">Blue Stuff</div><div class="sk">JMBLUE032</div></div>
+          <div class="pr">$22.99</div>
+        </div>
+      </div>
+      <div class="duocol">
+        <svg class="diagram bell" viewBox="0 0 1000 420" role="img" aria-label="Motor sawtooth: the cheapest slot overshoots but sits net-underwater; the model's ideal is stranded in a crater between rivals">
+          <defs>
+            <clipPath id="pos2yellowC"><rect x="211.4" y="0" width="172" height="280"/></clipPath>
+            <clipPath id="pos2blueC"><rect x="383.4" y="0" width="566.6" height="280"/></clipPath>
+            <clipPath id="neg2C"><rect x="0" y="280" width="1000" height="140"/></clipPath>
+          </defs>
+          <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 L 90,280 Z" fill="#FF4E4E" fill-opacity="0.12" clip-path="url(#neg2C)"/>
+          <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280 L 90,280 Z" fill="#FFB800" fill-opacity="0.15" clip-path="url(#pos2yellowC)"/>
+          <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280 L 90,280 Z" fill="#1E8FD5" fill-opacity="0.07" clip-path="url(#pos2blueC)"/>
+          <line x1="383.4" y1="181" x2="383.4" y2="280" stroke="#E03A3A" stroke-width="1.5" stroke-dasharray="3,4" opacity="0.35"/>
+          <g text-anchor="middle" class="hd">
+            <text x="350" y="213.2" font-size="11.5" fill="#5E7285" font-weight="600">AquaPool</text>
+            <text x="350" y="228.2" font-size="11" fill="#93A6B7" class="mono">$294.99</text>
+            <text x="415.8" y="201.7" font-size="11.5" fill="#5E7285" font-weight="600">InyoPools</text>
+            <text x="415.8" y="216.7" font-size="11" fill="#93A6B7" class="mono">$303.99</text>
+            <text x="496.7" y="182.5" font-size="11.5" fill="#5E7285" font-weight="600">Amazon</text>
+            <text x="496.7" y="197.5" font-size="11" fill="#93A6B7" class="mono">$319.95</text>
+            <text x="550" y="217.1" font-size="11.5" fill="#5E7285" font-weight="600">PoolGeek</text>
+            <text x="550" y="232.1" font-size="11" fill="#93A6B7" class="mono">$333.99</text>
+            <text x="899.8" y="225" font-size="11.5" fill="#5E7285" font-weight="600">Leslie's</text>
+            <text x="899.8" y="240" font-size="11" fill="#93A6B7" class="mono">$399.99</text>
+          </g>
+          <line x1="90" y1="280" x2="950" y2="280" stroke="#CFE6F4" stroke-width="3" stroke-linecap="round"/>
+          <text x="82" y="284" text-anchor="end" font-size="12" fill="#93A6B7">$0</text>
+          <g stroke="#CFE6F4">
+            <line x1="140.6" y1="277" x2="140.6" y2="283" stroke-width="1.5"/><line x1="267.1" y1="277" x2="267.1" y2="283" stroke-width="1.5"/>
+            <line x1="393.5" y1="273" x2="393.5" y2="287" stroke-width="2.5"/><line x1="520" y1="277" x2="520" y2="283" stroke-width="1.5"/>
+            <line x1="646.5" y1="277" x2="646.5" y2="283" stroke-width="1.5"/><line x1="772.9" y1="277" x2="772.9" y2="283" stroke-width="1.5"/>
+            <line x1="899.4" y1="273" x2="899.4" y2="287" stroke-width="2.5"/>
+          </g>
+          <text x="393.5" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$300</text>
+          <text x="899.4" y="300" text-anchor="middle" font-size="10" fill="#93A6B7" class="mono">$400</text>
+          <line x1="211.4" y1="44" x2="211.4" y2="398" stroke="#FF4E4E" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.85"/>
+          <text x="211.4" y="40" text-anchor="middle" font-size="11.5" fill="#E03A3A" font-weight="600" class="hd">landed cost $264</text>
+          <path d="M 90,395.4 Q 130.5,349.2 150.7,330 Q 170.9,310.8 191.15,295.4 Q 211.4,280 251.9,249.25 Q 292.4,218.5 330.3,199.25 Q 368.2,180 406.15,160.75 Q 444.1,141.5 482.05,129 Q 520,116.5 552.9,111.7 Q 585.8,106.9 621.2,112.7 Q 656.6,118.5 681.9,131 Q 707.2,143.5 737.55,163.65 Q 767.9,183.8 798.25,203.05 Q 828.6,222.3 858.95,237.7 Q 889.3,253.1 919.65,259.8 L 950,266.5" fill="none" stroke="#93A6B7" stroke-width="2.5" stroke-dasharray="7,6" opacity="0.75"/>
+          <path d="M 90,395.4 Q 128,352 168,318 Q 196,292 211.4,280 C 240,254 268,228 292.4,203.1 C 328,168 357,137.7 365.2,137.7 L 370.3,199.2 C 387.3,199.2 393.7,114.6 410.7,114.6 L 415.8,187.7 C 447.6,187.7 459.7,84.2 491.5,84.2 L 496.7,168.5 C 524.3,168.5 534.9,65.1 562.5,65.1 L 568.6,203.1 C 660,215 800,251 875,263 Q 890,266 899.4,255 L 903.5,280 L 950,280" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <g fill="#FFB800" stroke="#fff" stroke-width="2">
+            <circle cx="370.3" cy="199.2" r="5"/><circle cx="415.8" cy="187.7" r="5"/><circle cx="496.7" cy="168.5" r="5"/>
+            <circle cx="568.6" cy="203.1" r="5"/><circle cx="899.4" cy="255" r="5"/>
+          </g>
+          <line x1="585.8" y1="117" x2="585.8" y2="280" stroke="#FF4E4E" stroke-width="2" stroke-dasharray="5,4"/>
+          <circle cx="585.8" cy="109" r="5" fill="#FF4E4E"/>
+          <circle cx="585.8" cy="204" r="6" fill="#fff" stroke="#FF4E4E" stroke-width="2.5"/>
+          <text x="585.8" y="298" text-anchor="middle" font-size="13.5" font-weight="700" fill="#E03A3A" class="mono">$338</text>
+          <text x="598" y="198" text-anchor="start" font-size="13.5" font-weight="700" fill="#E03A3A" class="hd">&#8220;Ideal&#8221; Price</text>
+          <text transform="rotate(-90 34 215)" x="34" y="215" text-anchor="middle" font-size="12.5" fill="#93A6B7" class="hd" font-weight="600" letter-spacing="0.08em">GROSS MARGIN $</text>
+          <text x="92" y="110" font-size="12" fill="#93A6B7">cheaper &#8592;</text>
+          <text x="948" y="110" text-anchor="end" font-size="12" fill="#93A6B7">&#8594; pricier</text>
+        </svg>
+        <div class="duocard">
+          <img src="assets/hero-b2848v1.jpg" alt="Motor">
+          <div class="dc-t"><div class="nm">Century Motor</div><div class="sk">B2848V1</div></div>
+          <div class="pr">$332.99</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S11 · Q5 TRIPWIRE ═══ -->
+  <div class="slide" id="s11" style="justify-content:flex-start; padding-top:9vh;">
+    <div class="tag"><span class="pill" style="background:var(--coral); box-shadow:0 3px 10px rgba(255,78,78,0.3);">Automate</span></div>
+    <div class="headline">Competition trickles in,<br>Prices update <em>hourly.</em></div>
+
+    <svg class="diagram" viewBox="0 0 1000 234" style="max-height:33vh; margin-top:0.9rem; max-width:1050px; align-self:center;">
+      <defs>
+        <marker id="bArr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#1E8FD5"/></marker>
+        <marker id="rArr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#FF4E4E"/></marker>
+        <marker id="gArr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#1F7561"/></marker>
+      </defs>
+      <!-- new batch -->
+      <rect x="24" y="52" width="196" height="66" rx="16" fill="#fff" stroke="#CFE6F4" stroke-width="2"/>
+      <text x="122" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#2A3743" class="hd">New batch of prices</text>
+      <text x="122" y="102" text-anchor="middle" font-size="12" fill="#5E7285">every hour, unattended</text>
+      <line x1="220" y1="85" x2="300" y2="85" stroke="#1E8FD5" stroke-width="3" marker-end="url(#bArr)"/>
+      <!-- decision node -->
+      <polygon points="415,28 525,85 415,142 305,85" fill="#fff" stroke="#FFB800" stroke-width="3"/>
+      <text x="415" y="80" text-anchor="middle" font-size="14.5" font-weight="700" fill="#C98F00" class="hd">Plausibility</text>
+      <text x="415" y="99" text-anchor="middle" font-size="14.5" font-weight="700" fill="#C98F00" class="hd">gate</text>
+      <!-- sane branch -->
+      <line x1="525" y1="85" x2="648" y2="85" stroke="#1F7561" stroke-width="3" marker-end="url(#gArr)"/>
+      <text x="586" y="73" text-anchor="middle" font-size="12.5" fill="#1F7561" font-weight="600">looks fine</text>
+      <rect x="651" y="59" width="250" height="52" rx="16" fill="#E7F3EE" stroke="#1F7561" stroke-width="2"/>
+      <text x="776" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#1F7561" class="hd">Write to the store</text>
+      <text x="776" y="100" text-anchor="middle" font-size="11.5" fill="#5E7285">and log every decision</text>
+      <!-- absurd branch -->
+      <line x1="415" y1="142" x2="415" y2="168" stroke="#FF4E4E" stroke-width="3" marker-end="url(#rArr)"/>
+      <text x="435" y="162" font-size="12.5" fill="#E03A3A" font-weight="600">absurd</text>
+      <g class="tripwire-node">
+        <rect x="266" y="172" width="298" height="34" rx="17" fill="#FF4E4E"/>
+        <text x="415" y="194" text-anchor="middle" font-size="14" font-weight="800" fill="#fff" class="hd" letter-spacing="0.06em">&#9888;&nbsp; TRIPWIRE ARMED</text>
+      </g>
+      <text x="415" y="226" text-anchor="middle" font-size="12.5" fill="#5E7285" font-weight="500">Pause batch, alert humans</text>
+    </svg>
+
+    <div class="chip-row story" style="margin-top:1.1rem; align-items:flex-start; width:fit-content; align-self:center;">
+      <span class="lbl">TRUE STORY</span>
+      <span class="txt">Born from a real <span class="fire">$186 freight surprise</span> on a $35 item.<br>We use thresholds based on averages from real invoices,<br>and we revise the thresholds based on how much noise is generated.<br><em>An alarm that never cries wolf probably isn't armed.</em></span>
+    </div>
+  </div>
+
+  <!-- S12 "End of the tour" recap slide killed 2026-07-08 per request. -->
+
+  <!-- ═══ S13 · RUNGS ═══ -->
+  <div class="slide" id="s13" style="justify-content:flex-start; padding-top:8vh;">
+    <div class="tag"><span class="pill">One Step at a Time</span></div>
+    <div class="headline" style="max-width:none;">Do Everything <em>Manually</em> at First.</div>
+    <div class="lede" style="max-width:60ch;">Then automate it once you have a clear picture of what you <strong>WANT</strong>.</div>
+
+    <div class="rungs">
+      <div class="rung-step s1">
+        <div class="rg one">
+          <span class="rn">PHASE 1</span>
+          <div class="inner">
+            <div class="rh">Hand-price 50</div>
+            <div class="rb">Open five tabs, build the spreadsheet, learn your windows.<br>It's how we learned our patterns.</div>
+          </div>
+        </div>
+        <div class="rung-arrow" aria-hidden="true"><svg viewBox="0 0 44 44" width="44" height="44"><path d="M8 36 L36 8" stroke="#1E8FD5" stroke-width="4.5" stroke-linecap="round"/><path d="M20 8 L36 8 L36 24" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="rung-step s2">
+        <div class="rg two">
+          <span class="rn">PHASE 2</span>
+          <div class="inner">
+            <div class="rh">Data hygiene</div>
+            <div class="rb">Incomplete data is fine while you're hand-pricing products you know well. But to automate, you need to <em>get your product data in order.</em></div>
+          </div>
+        </div>
+        <div class="rung-arrow" aria-hidden="true"><svg viewBox="0 0 44 44" width="44" height="44"><path d="M8 36 L36 8" stroke="#1E8FD5" stroke-width="4.5" stroke-linecap="round"/><path d="M20 8 L36 8 L36 24" fill="none" stroke="#1E8FD5" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="rung-step s3">
+        <div class="rg three">
+          <span class="rn">PHASE 3</span>
+          <div class="inner">
+            <div class="rh">Est. Landed Cost + Markup/Chase Rules</div>
+            <div class="rb">Write your pricing rules down. Build per-SKU landed cost with realistic net shipping.</div>
+          </div>
+        </div>
+        <div class="rung-arrow" aria-hidden="true"><svg viewBox="0 0 44 44" width="44" height="44"><path d="M8 36 L36 8" stroke="#C98F00" stroke-width="4.5" stroke-linecap="round"/><path d="M20 8 L36 8 L36 24" fill="none" stroke="#C98F00" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="rung-step s4">
+        <div class="rg four">
+          <span class="rn">PHASE 4</span>
+          <div class="inner">
+            <div class="rh">Automate with a Tripwire</div>
+            <div class="rb">Only now let it run on a schedule, with a plausibility gate that halts and pages you if it runs aground.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S14 · CLOSE ═══ -->
+  <div class="slide" id="s14">
+    <div class="closewrap">
+      <div class="closeleft">
+        <div class="headline">Then you can embed it in your <em>Shopify Admin</em>.</div>
+        <img class="adminshot" src="ShopifyAdminBlock.png" alt="Parallax pricing block inside the Shopify admin">
+      </div>
+      <div class="closeright">
+        <img class="logo" src="assets/poolaroo.png" alt="Poolaroo">
+        <div class="ctitle">Seattle Shopify Operators Teaching Operators</div>
+        <div class="csub">Dynamic Competitive Pricing</div>
+        <div class="cperson">
+          <img class="portrait" src="assets/headshot.jpg" alt="Roy Steves">
+          <div class="cname">Roy Steves</div>
+          <div class="cemail">roy@poolaroo.com</div>
+        </div>
+        <div class="cslides">
+          <span class="cslabel">Get the deck</span>
+          <span class="curl">roysteves.com/pricing-talk</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- persistent water frame -->
+<div class="water"><div class="layer l1"></div><div class="layer l2"></div></div>
+<div class="water-alert"><div class="layer a1"></div><div class="layer a2"></div></div>
+
+<!-- HUD: following the motor -->
+<div class="hud" id="hud">
+  <div class="h-head">FOLLOWING &#183; SKU B2848V1</div>
+  <div class="h-body">
+    <img class="h-thumb" src="assets/hero-b2848v1.jpg" alt="">
+    <div class="h-col">
+      <div class="h-price">$332.99</div>
+      <div class="h-badges">
+        <span class="hb" data-i="1">SCRAPE</span>
+        <span class="hb" data-i="2">MATCH</span>
+        <span class="hb" data-i="3">COSTS</span>
+        <span class="hb" data-i="4">PRICE</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav" id="nav"></div>
+<div class="counter" id="counter"></div>
+<div class="timer" id="timer">00:00</div>
+<div class="notes-drawer" id="notesDrawer">
+  <div class="nd-head">Speaker notes <span>N notes &#183; T timer &#183; R reset &#183; &#8592;&#8594; navigate</span></div>
+  <div id="notesBody"></div>
+</div>
+
+<script>
+/* ══════ SPEAKER NOTES ══════ */
+const NOTES = {
+  s1: "[Start on this slide, let it sit while you're introduced.] Two products tonight: a pool-pump motor, and a bottle of stain remover. And their prices. Each is just one of about two thousand my store re-decides every single hour, while I sleep. We'll follow BOTH of these through the night, because they end up telling opposite stories. Here's the claim I want to earn: a price shouldn't just be a number you typed once. A price should KNOW things. Tonight is a peek in the back door at our shop. I'll show you everything these numbers know, and exactly where the hard parts are if you build this yourself. Which I hope some of you do.",
+  s2: "[PLACEHOLDER NOTE — wording pass later.] Start with the price you'd pick if you were the only store selling this motor. Cheap: tons of buyers, almost no margin each. Expensive: fat margin, almost no buyers. Multiply buyers by per-unit margin and your gross-margin dollars hump in the middle — one clean peak the model tells you to sit on, around three-thirty-eight here. Hold that picture in your head. It's the model every operator carries. In two slides the real competitors are going to shatter it.",
+  s3: "[PLACEHOLDER NOTE — wording pass later.] Now hang the real competitors on that smooth curve, and it shatters. Each rival is a cliff: just above the cheaper store a dollar barely costs you a sale, so margin climbs shelf by shelf until you bump the next competitor and fall off. The smooth bell was only ever the AVERAGE of these swings — the crests reach as far above it as the troughs fall below. So the model's tidy $338 peak? It's stranded in a crater between two rivals. You don't want the average. You want a crest.",
+  s4: "So: the tour. Every price that protects margin has to answer five questions: Who else sells it? Is what they're selling even the same product? What does it truly cost us to get it to a porch? Given all that, what's the right number? And can I trust the whole thing to run unattended? We're walking one motor through all five stops. [Point at the tracker, top right] Watch the badges; the motor earns them as it learns.",
+  s5b: "[PLACEHOLDER NOTE.] Question one, made concrete: who else actually sells this motor? Here's the field. Live prices this month run from AquaPool at two-ninety-five up to Leslie's at four hundred — same SKU, a thirty-six percent spread. That spread is the whole game. Now let me show you how we pin each of these down.",
+  s5c: "[PLACEHOLDER NOTE.] And here's HOW we pull each one — three flavors, and conveniently one of each. Amazon comes through Keepa, a paid, metered API: the only lane that costs us real money per call. Inyo, PoolGeek, and Leslie's each get a hand-built custom parser, written once per site. And AquaPool rides the generic JSON-LD scraper — free and automatic, no code written for it at all. Most of the catalog looks like that last one; that's the whole trick, and it's what got cheap.",
+  smatch: "[PLACEHOLDER NOTE.] Stop two: is it even the same product? Watch what happens when I ask twelve sellers to identify one bottle of Blue Stuff. On the right is our answer key — our UPC, our part number, our title. Now the rivals. Five publish our exact UPC: clean, automatic. Two give the manufacturer part number. Amazon, of course, speaks only ASIN. And four hand us nothing usable — one even gives its OWN internal SKU, fourteen-seven-ninety-five, which matches nothing of ours. For those four we match on the title, by hand. A price hung on the wrong bottle is worse than no price — so when we can't verify it, we don't guess.",
+  scost: "[PLACEHOLDER NOTE.] Stop three: what does it truly cost US to land each of these on a porch? Same math, both columns. COGS — our unit cost, cheapest source, and no, I'm not naming the vendor. Plus estimated shipping. And here's the trap: shipping is SIGNED. The motor is thirty-three pounds, seventeen-sixty of freight we absorb. The bottle is two and a half pounds, ships for pennies, and we collect a flat nine-ninety-nine from the customer — so its net shipping is NEGATIVE eighty cents. Its landed cost, seventeen-forty, is actually BELOW its raw COGS. Then the base curve: it targets a thin twenty-six percent on the expensive motor, a fat forty-eight on the cheap bottle. That's the curve you already believe, from the opening. What the curve does with these numbers, and what the competitors do to the curve — that's the next stop.",
+  s6b: "[PLACEHOLDER NOTE — don't linger.] Quick aside before we dig in: none of this is motor-specific. Same bell, same shatter — here it's Jack's Magic Blue Stuff, a commodity chemical. But because our cost sits far below the pack, the crests DESCEND, and the tallest one is the floor. Opposite answer from the motor: here we chop to cheapest. Hold that thought — we'll come back to this bottle at the pricing stop.",
+  s5: "Stop one: who else sells it? For specialty competitors, honestly, this is nearly free now; most storefronts publish machine-readable prices because Google rewards them for it. Amazon makes you work: no price API, the storefront actively resists, so you pay a data broker like Keepa to get in the door. Then you're mapping their ASINs to your UPCs, and asking whose price holds the buybox, Amazon or some third-party seller. And undocumented quirks: forget rating equals one and review data silently comes back empty. Real work. It's also the part that got cheap — [advance]",
+  s6: "— in 2014 this one step was the ENTIRE industry. Custom scrapers, built per site, always breaking: that dev cost is what kept price-intelligence companies from scaling, and I watched it from inside one. Two things changed. Commerce consolidated onto platforms that publish structured data intentionally. And AI now writes a parser in an afternoon. But note the trap: what most people try is pointing AI at every price at runtime. That's SKUs times competitors times every night, a token bill that scales with your catalog forever, and tokens are getting pricier. What we do instead: AI writes the parser once; runtime is deterministic and free. We did it by hand first. Sixteen hundred prices over three days taught us the patterns; the crawler then pulled twenty-four thousand in a day. And it stays cheap: three nights before this talk we pointed the same machinery at thirty-four hundred dormant matches. Seventy-seven minutes later they were all priced, with zero blocks.",
+  s7: "Stop two is where it gets hard: is that even the same motor? A price for the wrong product is worse than no price, because it poisons everything downstream. Our matching runs as a cascade: a human override outranks everything; then UPC, equivalence-aware because Pentair ships identical parts under Z-suffix twins; then SKU-plus-brand as a last resort, because part numbers alone lie across brands. And if nothing matches cleanly: skip. Don't guess. Straight from our own data: twenty-nine dollar bottle of phosphate remover, thirty-to-forty-four at four specialty rivals. And Amazon says a hundred fifty-nine ninety-five. Multipack? Gouger? If your matcher believes that number, your engine just learned a fictional market.",
+  s8: "Stop three: what does it truly cost US? Now the trap: shipping is SIGNED. Net shipping is what the carrier bills you minus what the customer pays you. We charge nine-ninety-nine flat under a hundred bucks, free over. So on a fifteen-dollar drain plug, the fee we collect beats the carrier bill: net shipping is NEGATIVE six dollars, our landed cost is below bare COGS, and we can price more aggressively than anyone doing COGS-plus-margin math. The motor: thirty-three pounds, free-shipping territory, seventeen dollars of freight. And a three-hundred-dollar handrail eats forty-six, fifteen percent of the ticket, invisible in COGS. Price off COGS alone and you're generous on the left of this line and bleeding on the right, and you can't see either.",
+  s9: "Stop four: the number itself. Three moves. One: a base curve, shipped cost in, retail price out. That's the price before any competitive information. Two: a competitive overlay that only ever chops DOWN toward rivals we can profitably beat; it never raises. Three: floors. MAP, a margin floor, and everything rounds to ninety-nine cents. This is the motor's actual market on one line: AquaPool at two-ninety-five, Inyo at three-oh-four, Amazon at three-twenty, us fourth at three-thirty-two. The engine re-decides that every hour, and it keeps choosing to hold. And when a rival IS beatable, the other branch fires fast. That bottle spinning down there is Jack's Magic Blue Stuff: Sunday afternoon we hand-logged two new rivals at twenty-three seventy-seven and twenty-three ninety-nine. At the next hourly tick the engine cut our price from thirty ninety-nine to twenty-two ninety-nine, seventy-eight cents under the new cheapest, and published it to the store. Nobody touched anything. Which brings us to the most counterintuitive thing we learned — [advance]",
+  s10: "— we're fourth of six, on purpose. The three cheapest rivals sit where we can't profitably follow. The old reflex, and our engine's old behavior for a while, was to snap down to the margin floor to 'stay close.' Look at what that buys: you're STILL not the cheapest, so the price-sorted shopper leaves anyway, and you gave up margin on every customer who was going to buy from you regardless: stock, shipping speed, trust. So now, when we can't win cleanly, we hold at the curve. Never pay to look competitive on a sale you were already losing. That one sentence took us an embarrassing amount of margin to learn.",
+  s11: "Last stop: this whole thing runs hourly with nobody in the room. So what happens when the data is garbage? One absurd input and a naive engine happily reprices the catalog around it. So before ANY write, a plausibility gate checks the batch: if any input looks absurd against the price it's about to produce, the whole batch halts, the job pauses ITSELF, and it pages a human. Nothing writes until a person turns it back on. True story: the gate was born from a real hundred-eighty-six-dollar freight surprise on a thirty-five-dollar item. Its first live trip was a false alarm: a legitimate fifty-pound bag of pool sand. We retuned the threshold and kept the tripwire. An alarm that never cries wolf probably isn't armed.",
+  s12: "End of the tour. Which stop was the expensive one in 2014? Only the first, and it's the cheap one now. Everything that was hard for us lives in stops two through five: identity, true cost, the decision, the guardrails. All data problems. The hard part moved: off the wire and into your data. And there's no silver bullet for any of it, so plan on a lot of lead ones: hygiene, judgment, boring parts that work. Good news is operators are already good at making those.",
+  s13: "You don't need our stack to start. Rung one: hand-price fifty SKUs, five tabs and a spreadsheet. It's how WE started, and it's what teaches you your windows. Rung two: write your rules down and build honest per-SKU landed cost, sign and all. This rung pays for everything after it. Rung three: only then automate, with a tripwire armed before you walk away. One rung by August is a real edge in your category.",
+  s14: "So — what does YOUR price know? [beat] We're all on Shopify here. If you're chewing on any piece of this (the matching, the shipping math, the hold-versus-chase logic), come find me afterward. I'd love to talk shop. Questions?"
+};
+
+/* ══════ HUD + alert state ══════ */
+const HUD_MAP = { s5b:1, s5c:1, s7:2, smatch:2, s8:3, scost:3, s11:5 };
+/* slides where the tracker follows the bottle (static hero) instead of the motor */
+const BOTTLE_SLIDES = new Set(['smatch']);
+/* No slide spins the corner tracker anymore — spinning the global HUD thumb
+   leaked bottle frames onto the next (motor) slide. Slide-local .spin imgs only. */
+const SPIN_HUD_SLIDES = new Set();
+const ALERT_SLIDES = new Set(['s11']);
+
+/* ══════ 360 spin — Blue Stuff, 36 frames ══════ */
+const SPIN_N = 36;
+const SPIN_PATHS = Array.from({ length: SPIN_N }, (_, k) =>
+  `assets/spin-jmblue032/frame-${String(k + 1).padStart(2, '0')}.jpg`);
+let spinReady = false;
+window.addEventListener('load', () => {
+  let loaded = 0;
+  SPIN_PATHS.forEach(p => {
+    const im = new Image();
+    im.onload = () => { if (++loaded === SPIN_N) spinReady = true; };
+    im.src = p;
+  });
+});
+function spinOnce(el) {
+  if (!spinReady || !el || el._spinning) return;
+  el._spinning = true;
+  let f = 0;
+  const iv = setInterval(() => {
+    f++;
+    if (f >= SPIN_N) { clearInterval(iv); el.src = SPIN_PATHS[0]; el._spinning = false; return; }
+    el.src = SPIN_PATHS[f];
+  }, 45);
+}
+function spinCurrent() {
+  if (!slides[cur]) return;
+  slides[cur].querySelectorAll('.spin').forEach(spinOnce);
+  if (SPIN_HUD_SLIDES.has(slides[cur].id)) { const t = hud.querySelector('.h-thumb'); if (t) spinOnce(t); }
+}
+setInterval(spinCurrent, 7000);
+
+/* ══════ NAV ══════ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const navEl = document.getElementById('nav');
+const counterEl = document.getElementById('counter');
+const drawer = document.getElementById('notesDrawer');
+const notesBody = document.getElementById('notesBody');
+const hud = document.getElementById('hud');
+const hudBadges = Array.from(hud.querySelectorAll('.hb'));
+let cur = 0;
+
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  navEl.appendChild(d);
+});
+
+function goTo(n) {
+  if (n < 0 || n >= slides.length) return;
+  slides[cur].classList.remove('active');
+  navEl.children[cur].classList.remove('active');
+  cur = n;
+  slides[cur].classList.add('active');
+  navEl.children[cur].classList.add('active');
+  counterEl.textContent = `${cur + 1} / ${slides.length}`;
+  navEl.style.visibility = (cur === 0 || cur === slides.length - 1) ? 'hidden' : 'visible';
+  counterEl.style.visibility = (cur === 0 || cur === slides.length - 1) ? 'hidden' : 'visible';
+  const id = slides[cur].id;
+  const lit = HUD_MAP[id];
+  if (lit === undefined) { hud.classList.remove('show'); }
+  else {
+    hud.classList.add('show');
+    const bottle = BOTTLE_SLIDES.has(id);
+    hud.querySelector('.h-head').textContent = bottle ? 'FOLLOWING · SKU JMBLUE032' : 'FOLLOWING · SKU B2848V1';
+    hud.querySelector('.h-thumb').src = bottle
+      ? 'assets/hero-jmblue032.jpg'
+      : 'assets/hero-b2848v1.jpg';
+    hud.querySelector('.h-price').textContent = bottle ? '$22.99' : '$332.99';
+    hudBadges.forEach(b => b.classList.toggle('on', Number(b.dataset.i) <= lit));
+  }
+  document.body.classList.toggle('alert', ALERT_SLIDES.has(id));
+  setTimeout(spinCurrent, 700);
+  notesBody.textContent = NOTES[id] || '';
+}
+goTo(0);
+
+/* ══════ TIMER ══════ */
+const timerEl = document.getElementById('timer');
+let tState = { running: false, shown: false, elapsed: 0, last: 0 };
+setInterval(() => {
+  if (tState.running) {
+    const now = performance.now();
+    tState.elapsed += now - tState.last;
+    tState.last = now;
+    const s = Math.floor(tState.elapsed / 1000);
+    timerEl.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+}, 400);
+function toggleTimer() {
+  if (!tState.shown) { tState.shown = true; timerEl.classList.add('show'); }
+  tState.running = !tState.running;
+  if (tState.running) tState.last = performance.now();
+  timerEl.classList.toggle('running', tState.running);
+  timerEl.classList.toggle('paused', !tState.running);
+}
+function resetTimer() {
+  tState.elapsed = 0; tState.last = performance.now();
+  timerEl.textContent = '00:00';
+  if (!tState.running) { timerEl.classList.remove('show','paused'); tState.shown = false; }
+}
+
+/* ══════ KEYS / TOUCH / CLICK ══════ */
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); goTo(cur + 1); }
+  else if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); goTo(cur - 1); }
+  else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+  else if (e.key === 'End') { e.preventDefault(); goTo(slides.length - 1); }
+  else if (e.key === 'n' || e.key === 'N') { drawer.classList.toggle('open'); }
+  else if (e.key === 't' || e.key === 'T') { toggleTimer(); }
+  else if (e.key === 'r' || e.key === 'R') { resetTimer(); }
+});
+let tx = null;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  if (tx === null) return;
+  const d = tx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 40) goTo(cur + (d > 0 ? 1 : -1));
+  tx = null;
+});
+document.getElementById('deck').addEventListener('click', e => {
+  if (e.target.closest('.nav') || e.target.closest('.notes-drawer') || e.target.closest('.timer') || e.target.closest('.hud')) return;
+  goTo(cur + 1);
+});
+</script>
+</body>
+</html>
